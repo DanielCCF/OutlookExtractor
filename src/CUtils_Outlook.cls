@@ -17,18 +17,13 @@ Attribute VB_Exposed = False
 Option Explicit
 
 
-Function GetOutlookInstance() As Object
+Function GetOutlookInstance(Optional createIfNotFound As Boolean) As Object
 
     On Error Resume Next
         Set GetOutlookInstance = GetObject(, "Outlook.Application")
+        If GetOutlookInstance Is Nothing And createIfNotFound Then _
+            Set GetOutlookInstance = CreateObject("Outlook.Application")
     On Error GoTo 0
-    
-End Function
-
-
-Function CreateOutlookInstance() As Object
-    
-    Set GetOutlookInstance = CreateObject("Outlook.Application")
     
 End Function
 
@@ -55,15 +50,23 @@ Sub SaveAttachments(ByVal mail As Object, _
 End Sub
 
 
+
+
 Sub FillCollectionWithSubFolders(ByRef foldersList As Collection, _
-                                 ByVal parentFolder As Object)
+                                 ByRef parentFolder As Object)
     Dim f As Object
+    Dim currentSession As Object
     
+    Set currentSession = GetOutlookInstance(True).Session
     For Each f In parentFolder.Folders
-        foldersList.Add f
-        FillCollectionWithSubFolders foldersList, f
+        'To avoid unecessary memory allocation
+        '0 = olMailItem
+        If f = "RPA-GPO-SUPPORT" Then Stop
+        If f.DefaultItemType <> 0 Then Exit Sub
+        foldersList.Add currentSession.GetFolderFromID(f.entryId, f.storeId)
+        FillCollectionWithSubFolders foldersList, currentSession.GetFolderFromID(f.entryId, f.storeId)
     Next
-    
+
 End Sub
 
 
@@ -90,7 +93,7 @@ Function GetMailsEntryIdCollectionFromFolder(ByVal targetFolder As Object) As Co
     Set GetMailsEntryIdCollectionFromFolder = New Collection
     For Each obj In targetFolder.Items
         If TypeOf obj Is Outlook.mailItem Then
-            GetMailsEntryIdCollectionFromFolder.Add obj.EntryID
+            GetMailsEntryIdCollectionFromFolder.Add obj.entryId
         End If
     Next
 
@@ -141,5 +144,18 @@ Private Sub FillAttachmentsDictionary(ByVal currentMailId As String, _
 
 End Sub
 
+
+
+Function GetSubFoldersFrom(ByRef folder As Object) As Collection
+
+
+    Dim f As Object
+    
+    Set GetSubFoldersFrom = New Collection
+    
+    For Each f In folder.Folders
+        GetSubFoldersFrom.Add folder
+    Next
+End Function
 
 

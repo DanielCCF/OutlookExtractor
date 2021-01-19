@@ -16,16 +16,17 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private MainController As CController
+'Private Mailboxes As Object
 
 
 Private Sub UserForm_Initialize()
 
     Set MainController = New CController
-'    LoadAvailableMailboxes
+'    Set Mailboxes = MainController.GetMailboxes
+                    LoadAvailableMailboxes
 '    Windows(ThisWorkbook.Name).Visible = False
 '    Application.Visible = False
-    
-    
+   
 End Sub
 
 
@@ -37,20 +38,24 @@ Private Sub UserForm_Terminate()
 End Sub
 
 
-'========================
-'Filters Page
-'========================
+Private Sub LoadAvailableMailboxes()
 
-
-Private Sub FilterTypeComboBox_Enter()
-    
-    Dim cell As Range
-    
-    For Each cell In SSupport.Range("FilterTypesTable")
-        FilterTypeComboBox.AddItem cell
-    Next
-    
+    With SSupport
+        .EraseCurrentMailBoxes
+        
+    End With
 End Sub
+
+
+'Private Sub LoadAvailableMailboxes()
+'
+'    Dim box As Object
+'
+'    For Each box In Mailboxes
+'        MailboxExtractComboBox.AddItem box.Name
+'    Next
+'
+'End Sub
 
 
 '========================
@@ -63,8 +68,6 @@ Private Sub PreconfiguredExtractionsComboBox_Enter()
     LoadPreconfiguredExtractions
     
 End Sub
-
-
 
 
 Private Sub LoadPreconfiguredExtractions()
@@ -82,19 +85,26 @@ Private Sub LoadPreconfiguredExtractions()
 End Sub
 
 
-Private Sub LoadAvailableMailboxes()
+'========================
+'Mailbox Page
+'========================
 
-    Dim mailboxes As Object
-    Dim box As Object
-    
-    For Each box In mailboxes
-        MailboxExtractComboBox.AddItem box.Name
-    Next
-    
+Private Sub AddMailboxButton_Click()
+
 End Sub
 
 
-Private Sub PreconfiguredExtractionsComboBox_Change()
+'========================
+'Filters Page
+'========================
 
 
+Private Sub FilterTypeComboBox_Enter()
+    
+    Dim cell As Range
+    
+    For Each cell In SSupport.Range("FilterTypesTable")
+        FilterTypeComboBox.AddItem cell
+    Next
+    
 End Sub

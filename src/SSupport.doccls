@@ -1,0 +1,61 @@
+﻿Option Explicit
+
+
+Function GetCurrentMailboxesID() As Range
+    
+    With Me.Range("MailboxesTable")
+        Set GetCurrentMailboxesID = Me.Range(.Cells(1, 2), .Cells(.Rows.Count, .Columns.Count))
+    End With
+    
+End Function
+
+
+Function GetCurrentMailboxesNames() As Range
+
+    With Me.Range("MailboxesTable")
+        Set GetCurrentMailboxesNames = Me.Range(.Cells(1, 1), .Cells(.Rows.Count, 1))
+    End With
+
+End Function
+
+Sub AddMailbox(ByVal mailboxName As String, _
+                    ByVal entryId As String, _
+                    ByVal storeId As String)
+    
+    Dim referenceCell As Range
+    
+    Set referenceCell = GetReferenceCell
+    
+    With referenceCell
+        .Value = mailboxName
+        .Offset(, 1).Value = entryId
+        .Offset(, 2).Value = storeId
+    End With
+    
+End Sub
+
+
+Private Function GetReferenceCell() As Range
+    
+    With Me.ListObjects("MailboxesTable")
+        If Application.CountA(.DataBodyRange) = 0 Then
+            Set GetReferenceCell = .DataBodyRange.Cells(1, 1)
+        Else
+            Set GetReferenceCell = .DataBodyRange.Cells(.DataBodyRange.Rows.Count, 1).Offset(1)
+        End If
+    End With
+    
+End Function
+
+Sub EraseCurrentMailBoxes()
+    
+    Dim firstCellTable As Range
+    
+    With Me.Range("MailboxesTable")
+        Set firstCellTable = .Cells(1, 1)
+        .Delete
+        firstCellTable = "Any value to bring table back"
+        firstCellTable = ""
+    End With
+
+End Sub
