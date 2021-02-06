@@ -50,6 +50,20 @@ Sub SaveAttachments(ByVal mail As Object, _
 End Sub
 
 
+Sub FillCollectionWithAllSubFolders(ByRef foldersList As Collection, _
+                                    ByRef parentFolder As Object)
+    Dim f As Variant
+    Dim currentSession As Object
+    
+    Set currentSession = GetOutlookInstance(True).Session
+    For Each f In parentFolder.Folders
+        If f.DefaultItemType = 0 Then
+            foldersList.Add currentSession.GetFolderFromID(f.entryId, f.storeId)
+            FillCollectionWithAllSubFolders foldersList, currentSession.GetFolderFromID(f.entryId, f.storeId)
+        End If
+    Next
+
+End Sub
 
 
 Sub FillCollectionWithSubFolders(ByRef foldersList As Collection, _
@@ -59,12 +73,9 @@ Sub FillCollectionWithSubFolders(ByRef foldersList As Collection, _
     
     Set currentSession = GetOutlookInstance(True).Session
     For Each f In parentFolder.Folders
-        'To avoid unecessary memory allocation
-        '0 = olMailItem
-        If f = "RPA-GPO-SUPPORT" Then Stop
-        If f.DefaultItemType <> 0 Then Exit Sub
-        foldersList.Add currentSession.GetFolderFromID(f.entryId, f.storeId)
-        FillCollectionWithSubFolders foldersList, currentSession.GetFolderFromID(f.entryId, f.storeId)
+        If f.DefaultItemType = 0 Then
+            foldersList.Add currentSession.GetFolderFromID(f.entryId, f.storeId)
+        End If
     Next
 
 End Sub
@@ -124,17 +135,17 @@ End Function
 Private Sub FillAttachmentsDictionary(ByVal currentMailId As String, _
                                       ByRef tempDictionary As Object)
     
-    Dim objOutlook As Object
+    Dim ObjOutlook As Object
     Dim att As Outlook.attachment
     Dim attReceivedTime As String
     Dim fullKeyName
     Dim currentMail As Object
     
-    Set objOutlook = GetOutlookInstance
-    Set currentMail = objOutlook.Session.GetItemFromID(currentMailId)
+    Set ObjOutlook = GetOutlookInstance
+    Set currentMail = ObjOutlook.Session.GetItemFromID(currentMailId)
     For Each att In currentMail.Attachments
         If tempDictionary.Exists(att.fileName) Then
-            If currentMail.ReceivedTime > objOutlook.Session.GetItemFromID(tempDictionary.item(att.fileName)).ReceivedTime Then
+            If currentMail.ReceivedTime > ObjOutlook.Session.GetItemFromID(tempDictionary.item(att.fileName)).ReceivedTime Then
                  tempDictionary.item(att.fileName) = currentMailId
             End If
         Else
