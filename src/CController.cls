@@ -7,6 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'@Folder "OutlookExtractor"
 Option Explicit
 
 Private UtilsOutlook As CUtils_Outlook
@@ -34,5 +35,17 @@ End Function
 Function GetDownloadFolder(ByVal initialPath As String) As String
 
     GetDownloadFolder = UtilsFolder.GetChosenFolderName(initialPath)
+
+End Function
+
+
+Function IsDate(ByVal target As String) As Boolean
+    
+    Dim dummy
+    
+    On Error Resume Next
+        dummy = CDate(target)
+        If Err.Number = 0 Then IsDate = True
+    On Error GoTo 0
 
 End Function
