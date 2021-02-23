@@ -1,0 +1,11 @@
+MailboxExtractComboBox, FolderStoreFilesTextBox, MailPropertyComboBox, FilterTypeComboBox, FilterTypeComboBox
+
+&H80000005&
+&H00F0F0FF&
+
+
+MailboxList, FiltersListBox
+
+DownloadAttachmentsCheckBox
+GetMailAsFileCheckBox
+GetMailPropertiesCheckBox
