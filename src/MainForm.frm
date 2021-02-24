@@ -13,7 +13,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-'@Folder "OutlookExtractor"
+
 Option Explicit
 
 Private MainController As CController
@@ -49,7 +49,6 @@ Private Sub UserForm_Terminate()
 '    Application.Visible = True
 
 End Sub
-
 
 
 '========================
@@ -91,7 +90,7 @@ Private Function HasEmptyFields() As Boolean
     Dim downloadOptionsChecked As Integer
 
     With FolderStoreFilesTextBox
-        If .Value = "" Then
+        If .value = "" Then
             .BackColor = INVALID_FIELD_COLOR
             HasEmptyFields = True
         End If
@@ -105,7 +104,7 @@ Private Function HasEmptyFields() As Boolean
     Next
     
     For i = LBound(CheckBoxesList) To UBound(CheckBoxesList)
-        downloadOptionsChecked = downloadOptionsChecked + CInt(CheckBoxesList(i).Value)
+        downloadOptionsChecked = downloadOptionsChecked + CInt(CheckBoxesList(i).value)
     Next
     If downloadOptionsChecked = 0 Then
         HasEmptyFields = True
@@ -138,11 +137,13 @@ End Sub
 'Mailbox Page
 '========================
 
+
 Private Sub MailboxList_Change()
     
     MailboxExtractComboBox.BackColor = NORMAL_FIELD_COLOR
     
 End Sub
+
 
 Private Sub LoadAvailableMailboxes()
 
@@ -163,31 +164,32 @@ Private Sub EditMailboxButton_Click()
 
     With MailboxList
         If .ListIndex = -1 Then Exit Sub
-        MailboxExtractComboBox.Value = .List(.ListIndex, 0)
-        If .List(.ListIndex, 1) = IncludeSubfoldersYes.Caption Then
-            IncludeSubfoldersYes.Value = True
+        MailboxExtractComboBox.value = .list(.ListIndex, 0)
+        If .list(.ListIndex, 1) = IncludeSubfoldersYes.Caption Then
+            IncludeSubfoldersYes.value = True
         Else
-            IncludeSubfoldersNo.Value = True
+            IncludeSubfoldersNo.value = True
         End If
         .RemoveItem MailboxList.ListIndex
     End With
     
 End Sub
 
+
 Private Sub AddMailboxButton_Click()
     
-    If IncludeSubfoldersYes + IncludeSubfoldersNo = 0 Or MailboxExtractComboBox.Value = "" Then
+    If IncludeSubfoldersYes + IncludeSubfoldersNo = 0 Or MailboxExtractComboBox.value = "" Then
         MsgBox "No folder or option for subfolder selected. Please, fill this information", vbExclamation
         Exit Sub
     End If
     
     With MailboxList
         .AddItem
-        .List(.ListCount - 1, 0) = MailboxExtractComboBox.Value
+        .list(.ListCount - 1, 0) = MailboxExtractComboBox.value
         If IncludeSubfoldersYes Then
-            .List(.ListCount - 1, 1) = IncludeSubfoldersYes.Caption
+            .list(.ListCount - 1, 1) = IncludeSubfoldersYes.Caption
         Else
-            .List(.ListCount - 1, 1) = IncludeSubfoldersNo.Caption
+            .list(.ListCount - 1, 1) = IncludeSubfoldersNo.Caption
         End If
     End With
     
@@ -225,7 +227,7 @@ Private Sub AttachFolderButton_Click()
 
     Dim currentFolder As String
     
-    currentFolder = MainController.GetDownloadFolder(FolderStoreFilesTextBox.Value)
+    currentFolder = MainController.GetDownloadFolder(FolderStoreFilesTextBox.value)
     
     If currentFolder <> "" Then FolderStoreFilesTextBox = currentFolder
     
@@ -238,12 +240,12 @@ Private Sub DownloadAttachmentsCheckBox_Click()
     If DownloadAttachmentsCheckBox Then
         NewestOptionButton.Visible = True
         OldestOptionButton.Visible = True
-        NewestOptionButton.Value = True
+        NewestOptionButton.value = True
     Else
         NewestOptionButton.Visible = False
         OldestOptionButton.Visible = False
-        NewestOptionButton.Value = False
-        OldestOptionButton.Value = False
+        NewestOptionButton.value = False
+        OldestOptionButton.value = False
     End If
 
 End Sub
@@ -303,6 +305,7 @@ Private Sub TreatDateField(ByRef field As Object)
 
 End Sub
 
+
 '========================
 'Filters Page
 '========================
@@ -339,9 +342,9 @@ Private Sub AddFilterButton_Click()
     
     With FiltersListBox
         .AddItem
-        .List(.ListCount - 1, 0) = MailPropertyComboBox.Value
-        .List(.ListCount - 1, 1) = FilterTypeComboBox.Value
-        .List(.ListCount - 1, 2) = FilterValueTextBox.Value
+        .list(.ListCount - 1, 0) = MailPropertyComboBox.value
+        .list(.ListCount - 1, 1) = FilterTypeComboBox.value
+        .list(.ListCount - 1, 2) = FilterValueTextBox.value
     End With
     
     
@@ -360,9 +363,9 @@ Private Sub EditButton_Click()
 
     With FiltersListBox
         If .ListIndex = -1 Then Exit Sub
-        MailPropertyComboBox = .List(.ListIndex, 0)
-        FilterTypeComboBox = .List(.ListIndex, 1)
-        FilterValueTextBox = .List(.ListIndex, 2)
+        MailPropertyComboBox = .list(.ListIndex, 0)
+        FilterTypeComboBox = .list(.ListIndex, 1)
+        FilterValueTextBox = .list(.ListIndex, 2)
         .RemoveItem FiltersListBox.ListIndex
     End With
     
@@ -371,6 +374,6 @@ End Sub
 
 Private Sub HomeButton_Click()
 
-    MultiPage.Value = 0
+    MultiPage.value = 0
     
 End Sub

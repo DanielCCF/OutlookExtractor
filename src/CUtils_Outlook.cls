@@ -7,7 +7,6 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'@Folder "OutlookExtractor"
 '==================================================================
 'Description: This class is responsable for dealing with
 '             general Outlook actions. Those actions are not

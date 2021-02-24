@@ -7,7 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
-'@Folder "OutlookExtractor"
+
 Option Explicit
 
 
@@ -19,20 +19,20 @@ Function GetMailboxInformation(ByVal dataRow As Long) As Range
     End If
     
     With Me.ListObjects("MailboxesTable")
-        Set GetMailboxInformation = .DataBodyRange.rows(dataRow)
+        Set GetMailboxInformation = .DataBodyRange.Rows(dataRow)
     End With
 
 End Function
 
 
-Sub AddMailbox(ByVal Name As String, _
+Sub AddMailbox(ByVal name As String, _
                ByVal entryId As String, _
                ByVal storeId As String)
     
     With GetReferenceCell
-        .Value = Name
-        .Offset(, 1).Value = entryId
-        .Offset(, 2).Value = storeId
+        .value = name
+        .Offset(, 1).value = entryId
+        .Offset(, 2).value = storeId
     End With
     
 End Sub
@@ -44,7 +44,7 @@ Private Function GetReferenceCell() As Range
         If Application.CountA(.DataBodyRange) = 0 Then
             Set GetReferenceCell = .DataBodyRange.Cells(1, 1)
         Else
-            Set GetReferenceCell = .DataBodyRange.Cells(.DataBodyRange.rows.Count, 1).Offset(1)
+            Set GetReferenceCell = .DataBodyRange.Cells(.DataBodyRange.Rows.Count, 1).Offset(1)
         End If
     End With
     
@@ -67,7 +67,7 @@ End Sub
 
 Function GetAmountMailboxes()
 
-     GetAmountMailboxes = Me.ListObjects("MailboxesTable").DataBodyRange.rows.Count
+     GetAmountMailboxes = Me.ListObjects("MailboxesTable").DataBodyRange.Rows.Count
 
 End Function
 
@@ -94,7 +94,7 @@ Private Sub Add1ColumnTableDataInCollection(ByRef targetCollection As Collection
     Set targetCollection = New Collection
     
     For Each rng In Me.ListObjects(tableName).DataBodyRange
-        targetCollection.Add rng.Value
+        targetCollection.Add rng.value
     Next
 End Sub
 

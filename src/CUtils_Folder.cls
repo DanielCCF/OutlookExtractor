@@ -7,7 +7,6 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'@Folder "OutlookExtractor"
 '==================================================================
 'Description: This class is responsable for dealing with
 '             general folder actions. Those actions are not
@@ -46,8 +45,8 @@ Function PickAllFilesNamesInAFolder(ByVal folder As String, _
                               .files
 
     For Each file In filesInChosenFolder
-        If InStr(1, file.Name, stringFilter) > 0 Then
-            result = result & folder & "\" & file.Name & delimiter
+        If InStr(1, file.name, stringFilter) > 0 Then
+            result = result & folder & "\" & file.name & delimiter
         End If
     Next
     
