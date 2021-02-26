@@ -81,6 +81,10 @@ Private Sub ExecuteButton_Click()
     
     RemoveInvalidFieldIndicator
     
+    If RecordAsNewExtraction Then
+    
+    End If
+    
 End Sub
 
 
@@ -131,6 +135,32 @@ Private Sub RemoveInvalidFieldIndicator()
     Next
     
 End Sub
+
+
+Private Function RecordAsNewExtraction() As Boolean
+    
+    Dim userChoosedAnOption As Boolean
+    Dim extractionName As String
+    
+    If MsgBox("Do you want to record the current configuration for later use?", vbYesNo) = vbNo Then _
+        Exit Function
+    
+    Do Until userChooseAnOption
+        extractionName = InputBox("Type a name for your extraction")
+        If extractionName = "" Then
+            If MsgBox("The name is empty, do you still want to choose a name?", vbYesNo) = vbNo Then _
+                userChoosedAnOption = True
+        End If
+        
+        If MainController.IsAlreadyInUse(extractioName) Then
+            MsgBox ("The given name is already in use. Please choose other one.")
+        Else
+            userChooseAnOption = True
+            RecordAsNewExtraction = True
+        End If
+    Loop
+    
+End Function
 
 
 '========================

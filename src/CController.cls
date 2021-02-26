@@ -12,12 +12,14 @@ Option Explicit
 Private UtilsOutlook As CUtils_Outlook
 Private UtilsFolder As CUtils_Folder
 Private ObjOutlook As Object
+Private ObjModel As CModel
 
 Private Sub Class_Initialize()
 
     Set UtilsOutlook = New CUtils_Outlook
     Set UtilsFolder = New CUtils_Folder
     Set ObjOutlook = UtilsOutlook.GetOutlookInstance(True)
+    Set ObjModel = New CModel
     
 End Sub
 
@@ -48,3 +50,27 @@ Function IsDate(ByVal target As String) As Boolean
     On Error GoTo 0
 
 End Function
+
+
+Function GetMailboxes(ByVal extracionName As String) As CMailbox()
+
+    
+
+End Function
+
+
+Function IsAlreadyInUse(ByVal extractionName As String) As Boolean
+    
+    IsAlreadyInUse = (ObjModel.GetFromExtractionTable(extractionName) = "")
+            
+End Function
+
+
+Function Execute(ByRef chosenMailboxes() As CMailbox, _
+                 ByRef chosenFilters() As CFilters, _
+                 ByRef chosenDownloadOptions As CDownloadOptions)
+
+    
+    
+End Function
+
