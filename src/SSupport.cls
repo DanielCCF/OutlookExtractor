@@ -26,13 +26,13 @@ End Function
 
 
 Sub AddMailbox(ByVal name As String, _
-               ByVal entryId As String, _
-               ByVal storeId As String)
+               ByVal entryId As String)
+               'ByVal storeId As String)
     
     With GetReferenceCell
         .value = name
         .Offset(, 1).value = entryId
-        .Offset(, 2).value = storeId
+        '.Offset(, 2).value = storeId
     End With
     
 End Sub
@@ -98,3 +98,21 @@ Private Sub Add1ColumnTableDataInCollection(ByRef targetCollection As Collection
     Next
 End Sub
 
+
+Function GetFolderId(ByVal folderName As String) As String
+
+
+    On Error Resume Next
+        GetFolderId = SSupport.ListObjects(MailboxesTable). _
+                               DataBodyRange.Columns(1). _
+                               Find(folderName).Offset(, 1)
+        If Err.Number <> 0 Then
+            On Error GoTo 0
+            Err.Raise 513, _
+                    "\\SSupport\GetFolderId", _
+                    "The folder: " & folderName & " was not found."
+        End If
+    On Error GoTo 0
+
+
+End Function

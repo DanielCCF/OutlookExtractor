@@ -52,21 +52,56 @@ Function IsDate(ByVal target As String) As Boolean
 End Function
 
 
-Function GetMailboxes(ByVal extracionName As String) As CMailbox()
+Function GetMailboxesFrom(ByVal ExtractionName As String) As CMailbox()
 
-    
+    GetMailboxesFrom = ObjModel.GetFromMailboxTable(ExtractionName)
 
 End Function
 
 
-Function IsAlreadyInUse(ByVal extractionName As String) As Boolean
+Function GetFiltersFrom(ByVal ExtractionName As String) As CFilters()
+
+    GetFiltersFrom = ObjModel.GetFromFiltersTable(ExtractionName)
+
+End Function
+
+
+Function GetDownloadOptionsFrom(ByVal ExtractionName As String) As CDownloadOptions
+
+    GetDownloadOptionsFrom = ObjModel.GetFromDownloadOptionsTable(ExtractionName)
+
+End Function
+
+
+Sub SaveConfiguration(ByRef chosenExtraction As CExtraction, _
+                      ByRef chosenmailboxes() As CMailbox, _
+                      ByRef chosenFilters() As CFilters, _
+                      ByRef chosenDownloadOptions As CDownloadOptions)
     
-    IsAlreadyInUse = (ObjModel.GetFromExtractionTable(extractionName) = "")
+    If IsAlreadyInUse(chosenExtraction) Then
+        Err.Raise 513, _
+                  "\\OutlookExtractor\CController\SaveConfiguration", _
+                  "The given Extraction Name is already in use, please choose other one."
+    End If
+    
+    With ObjModel
+       .WriteOnExtractionTable chosenExtraction
+       .WriteOnMailboxTable chosenmailboxes
+       .WriteOnFiltersTable chosenFilters
+       .WriteOnDownloadOptionsTable chosenDownloadOptions
+    End With
+    
+End Sub
+
+
+Function IsAlreadyInUse(ByRef chosenExtraction As CExtraction) As Boolean
+    
+    IsAlreadyInUse = (ObjModel.GetFromExtractionTable(chosenExtraction.ExtractionName) = "")
             
 End Function
 
 
-Function Execute(ByRef chosenMailboxes() As CMailbox, _
+Function Execute(ByRef chosenmailboxes() As CMailbox, _
                  ByRef chosenFilters() As CFilters, _
                  ByRef chosenDownloadOptions As CDownloadOptions)
 

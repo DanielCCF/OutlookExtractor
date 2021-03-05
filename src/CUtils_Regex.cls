@@ -37,7 +37,7 @@ Function HasPattern(ByVal Pattern As String, _
                      
     With RegEx
         .Pattern = Pattern
-        HasPattern = .test(textToSearch)
+        HasPattern = .Test(textToSearch)
         .Pattern = ""
     End With
     
@@ -50,7 +50,7 @@ Function Extract(ByVal Pattern As String, _
     With RegEx
         .Pattern = Pattern
     
-        If .test(textToSearch) Then
+        If .Test(textToSearch) Then
             Extract = .Execute(textToSearch)(0)
         Else
             Extract = vbNullString

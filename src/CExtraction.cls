@@ -9,11 +9,11 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-Private Type Extraction
+Private Type extraction
     ExtractionName As String
 End Type
 
-Private this As Extraction
+Private this As extraction
 
 Public Property Get ExtractionName() As String
 

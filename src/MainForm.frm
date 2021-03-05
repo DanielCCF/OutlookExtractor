@@ -73,6 +73,32 @@ End Sub
 
 Private Sub ExecuteButton_Click()
     
+    Dim chosenExtraction As CExtraction
+    Dim chosenmailboxes As CMailbox
+    Dim chosenFilters As CFilters
+    Dim chosenDownloadOptions As CDownloadOptions
+    
+    If HasEmptyFields Then
+        MsgBox "Some fields were not filled, please check the tabs.", vbExclamation
+        Exit Sub
+    End If
+    
+    RemoveInvalidFieldIndicator
+    
+    GetCurrentUserInput chosenmailboxes, _
+                               chosenFilters, _
+                               chosenDownloadOptions
+                               
+'    RecordAsNewExtraction chosenExtraction, _
+'                          chosenmailboxes, _
+'                          chosenFilters, _
+'                          chosenDownloadOptions
+'
+
+End Sub
+
+
+Private Sub SaveButton_Click()
 
     If HasEmptyFields Then
         MsgBox "Some fields were not filled, please check the tabs.", vbExclamation
@@ -81,9 +107,6 @@ Private Sub ExecuteButton_Click()
     
     RemoveInvalidFieldIndicator
     
-    If RecordAsNewExtraction Then
-    
-    End If
     
 End Sub
 
@@ -137,30 +160,63 @@ Private Sub RemoveInvalidFieldIndicator()
 End Sub
 
 
-Private Function RecordAsNewExtraction() As Boolean
+Private Sub RecordAsNewExtraction(ByRef chosenExtraction As CExtraction, _
+                                  ByRef chosenmailboxes() As CMailbox, _
+                                  ByRef chosenFilters() As CFilters, _
+                                  ByRef chosenDownloadOptions As CDownloadOptions)
     
     Dim userChoosedAnOption As Boolean
-    Dim extractionName As String
+    Dim ExtractionName As String
+    Dim tempError As Object
     
     If MsgBox("Do you want to record the current configuration for later use?", vbYesNo) = vbNo Then _
-        Exit Function
+        Exit Sub
     
     Do Until userChooseAnOption
-        extractionName = InputBox("Type a name for your extraction")
-        If extractionName = "" Then
+        ExtractionName = InputBox("Type a name for your extraction")
+        If ExtractionName = "" Then
             If MsgBox("The name is empty, do you still want to choose a name?", vbYesNo) = vbNo Then _
                 userChoosedAnOption = True
-        End If
-        
-        If MainController.IsAlreadyInUse(extractioName) Then
-            MsgBox ("The given name is already in use. Please choose other one.")
         Else
+            MainController.SaveConfiguration chosenExtraction, _
+                                             chosenmailboxes, _
+                                             chosenFilters, _
+                                             chosenDownloadOptions
             userChooseAnOption = True
             RecordAsNewExtraction = True
         End If
     Loop
     
-End Function
+End Sub
+
+
+Private Sub GetCurrentUserInput(ByRef chosenExtraction As CExtraction, _
+                                ByRef chosenmailboxes() As CMailbox, _
+                                ByRef chosenFilters() As CFilters, _
+                                ByRef chosenDownloadOptions As CDownloadOptions)
+    
+    Dim i As Integer
+    
+    chosenExtraction.ExtractionName = PreconfiguredExtractionsComboBox.value
+    
+    With MailboxList
+        For i = 1 To .ListCount
+            chosenmailboxes.ExtractionName = chosenExtraction.ExtractionName
+            chosenmailboxes.MailboxItemId = SSupport.GetFolderId(.list(i, 0))
+            chosenmailboxes.IncludeSubfolders = .list(i, 1)
+        Next
+    End With
+    
+    With FiltersListBox
+        For i = 1 To .ListCount
+            chosenFilters.ExtractionName
+            chosenFilters.FilterType
+            chosenFilters.FilterValue
+            chosenFilters.MailProperty
+        Next
+    End With
+
+End Sub
 
 
 '========================
@@ -183,7 +239,7 @@ Private Sub LoadAvailableMailboxes()
         .EraseCurrentMailBoxes
         For Each box In Mailboxes
             MailboxExtractComboBox.AddItem box.FolderPath
-            .AddMailbox box.FolderPath, box.entryId, box.storeId
+            .AddMailbox box.FolderPath, box.entryId ', box.storeId
         Next
     End With
     
