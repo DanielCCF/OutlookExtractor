@@ -8,7 +8,9 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
+Option Base 1
 
+Private Const FIRST_ELEMENT_ARRAY = 1
 Private ExtractionTable As ListObject
 Private MailboxTable As ListObject
 Private DownloadOptionsTable As ListObject
@@ -23,6 +25,30 @@ Private Sub Class_Initialize()
         Set FiltersTable = .ListObjects("FiltersTable")
     End With
     
+End Sub
+
+
+Sub DeleteFromAllTables(ByVal ExtractionName As String)
+    
+    Dim tables As Variant
+    Dim i As Integer
+    Dim currentData As Range
+    
+    If Not (ExtractionTable.DataBodyRange.Find(info.ExtractionName, , , xlWhole, , , True) Is Nothing) Then
+        Err.Raise 513, _
+                  "\\OutlookExtractor\CModel\WriteOnExtractionTable", _
+                  "The given extraction name already exists on the database. Please choose other name."
+    ElseIf extracitoname = "" Then
+        End Sub
+    End If
+    
+    tables = Array(ExtractionTable, MailboxTable, DownloadOptionsTable, FiltersTable)
+    
+    For i = LBound(tables) To UBound(tables)
+        Set currentData = GetFilteredTable(ExtractionName, tables(i))
+        currentData.SpecialCells(xlCellTypeVisible).EntireRow.Delete
+    Next
+
 End Sub
 
 
@@ -128,17 +154,18 @@ Private Sub WriteOnTable(ByVal rowInformation As Variant, _
 End Sub
 
 
-Function GetFromExtractionTable(ByVal ExtractionName As String) As CMailbox()
+Function GetFromExtractionTable(ByVal ExtractionName As String) As CExtraction()
 
     Dim row As Range
     Dim dataRange As Range
-     Dim list() As CExtraction
+    Dim list() As CExtraction
+    Dim i As Long
     
     Set dataRange = GetFilteredTable(ExtractionName, ExtractionTable)
     
     ReDim list(dataRange.Rows.Count)
-    For Each row In dataRange.Rows
-        Set list(i) = New CMailbox
+    For i = FIRST_ELEMENT_ARRAY To dataRange.Rows.Count
+        Set list(i) = New CExtraction
         list(i).ExtractionName = dataRange.Rows(i).Cells(1, 1)
     Next
     
@@ -156,7 +183,7 @@ Function GetFromMailboxTable(ByVal ExtractionName As String) As CMailbox()
     Set dataRange = GetFilteredTable(ExtractionName, MailboxTable)
     
     ReDim list(dataRange.Rows.Count)
-    For Each row In dataRange.Rows
+     For i = FIRST_ELEMENT_ARRAY To dataRange.Rows.Count
         Set list(i) = New CMailbox
         list(i).ExtractionName = dataRange.Rows(i).Cells(1, 1)
         list(i).MailboxItemId = dataRange.Rows(i).cels(1, 2)
@@ -177,7 +204,7 @@ Function GetFromDownloadOptionsTable(ByVal ExtractionName As String) As CDownloa
     Set dataRange = GetFilteredTable(ExtractionName, DownloadOptionsTable)
     
     ReDim list(dataRange.Rows.Count)
-    For Each row In dataRange.Rows
+    For i = FIRST_ELEMENT_ARRAY To dataRange.Rows.Count
         Set list(i) = New CDownloadOptions
         list(i).ExtractionName = dataRange.Rows(i).Cells(1, 1)
         list(i).DownloadFolder = dataRange.Rows(i).Cells(1, 2)
@@ -202,7 +229,7 @@ Function GetFromFiltersTable(ByVal ExtractionName As String) As CFilters()
     Set dataRange = GetFilteredTable(ExtractionName, FiltersTable)
     
     ReDim list(dataRange.Rows.Count)
-    For i = 0 To dataRange.Rows.Count
+    For i = FIRST_ELEMENT_ARRAY To dataRange.Rows.Count
         Set list(i) = New CFilters
         list(i).ExtractionName = dataRange.Rows(i).Cells(1, 1)
         list(i).MailProperty = dataRange.Rows(i).Cells(1, 2)
@@ -220,8 +247,10 @@ Private Function GetFilteredTable(ByVal ExtractionName As String, _
                                   
     With targetTable
         .Range.AutoFilter
-        .Range.AutoFilter 1, ExtractionName
+        If ExtractionName <> "" Then .Range.AutoFilter 1, ExtractionName
         Set GetFilteredTable = .DataBodyRange.SpecialCells(xlCellTypeVisible)
     End With
     
 End Function
+
+

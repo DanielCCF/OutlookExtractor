@@ -24,6 +24,19 @@ Private Sub Class_Initialize()
 End Sub
 
 
+Sub DeleteDataFrom(ByVal currentExtraction As CExtraction)
+    
+    ObjModel.DeleteFromAllTables (currentExtraction.ExtractionName)
+
+End Sub
+
+Function GetExtractionsNames() As CExtraction()
+    
+   GetExtractionsNames = ObjModel.GetFromExtractionTable("")
+
+End Function
+
+
 Function GetMailboxes() As Collection
     
     Set GetMailboxes = New Collection
@@ -52,23 +65,23 @@ Function IsDate(ByVal target As String) As Boolean
 End Function
 
 
-Function GetMailboxesFrom(ByVal ExtractionName As String) As CMailbox()
+Function GetMailboxesFrom(ByVal currentExtraction As CExtraction) As CMailbox()
 
-    GetMailboxesFrom = ObjModel.GetFromMailboxTable(ExtractionName)
-
-End Function
-
-
-Function GetFiltersFrom(ByVal ExtractionName As String) As CFilters()
-
-    GetFiltersFrom = ObjModel.GetFromFiltersTable(ExtractionName)
+    GetMailboxesFrom = ObjModel.GetFromMailboxTable(currentExtraction.ExtractionName)
 
 End Function
 
 
-Function GetDownloadOptionsFrom(ByVal ExtractionName As String) As CDownloadOptions
+Function GetFiltersFrom(ByVal currentExtraction As CExtraction) As CFilters()
 
-    GetDownloadOptionsFrom = ObjModel.GetFromDownloadOptionsTable(ExtractionName)
+    GetFiltersFrom = ObjModel.GetFromFiltersTable(currentExtraction.ExtractionName)
+
+End Function
+
+
+Function GetDownloadOptionsFrom(ByVal currentExtraction As CExtraction) As CDownloadOptions
+
+    GetDownloadOptionsFrom = ObjModel.GetFromDownloadOptionsTable(currentExtraction.ExtractionName)
 
 End Function
 

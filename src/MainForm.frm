@@ -58,18 +58,34 @@ End Sub
 
 Private Sub LoadPreconfiguredExtractions()
     
-    Dim extractions As Collection
-    Dim item As Variant
+    Dim extractions() As CExtraction
+    Dim i As Long
     
-    Set extractions = SMainToolOptions.GetExtractionsNames
+    extractions = MainController.GetExtractionsNames
     
-    For Each item In extractions
-        PreconfiguredExtractionsComboBox.AddItem item
+    PreconfiguredExtractionsComboBox.AddItem ""
+    For i = LBound(extractions) To UBound(extractions)
+        PreconfiguredExtractionsComboBox.AddItem extractions(i).ExtractionName
     Next
     
     
 End Sub
 
+Private Sub DeleteExtractionButton_Click()
+
+    If MsgBox("Are you sure deleting this extraction? It will be impossible to revert.") = vbNo Then _
+        Exit Sub
+        
+    
+        
+End Sub
+
+Private Sub PreconfiguredExtractionsComboBox_Change()
+    
+    DeleteExtractionButton.Visible = (PreconfiguredExtractionsComboBox.value <> "")
+    DeleteExtractionButton.Enabled = (PreconfiguredExtractionsComboBox.value <> "")
+
+End Sub
 
 Private Sub ExecuteButton_Click()
     
