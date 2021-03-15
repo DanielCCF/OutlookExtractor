@@ -86,39 +86,64 @@ Function GetDownloadOptionsFrom(ByVal currentExtraction As CExtraction) As CDown
 End Function
 
 
-Sub SaveConfiguration(ByRef chosenExtraction As CExtraction, _
-                      ByRef chosenmailboxes() As CMailbox, _
-                      ByRef chosenFilters() As CFilters, _
-                      ByRef chosenDownloadOptions As CDownloadOptions)
+Sub SaveConfiguration(ByRef ChosenExtraction As CExtraction, _
+                      ByRef ChosenMailboxes() As CMailbox, _
+                      ByRef ChosenFilters() As CFilters, _
+                      ByRef ChosenDownloadOptions As CDownloadOptions)
     
-    If IsAlreadyInUse(chosenExtraction) Then
+    If IsAlreadyInUse(ChosenExtraction) Then
         Err.Raise 513, _
                   "\\OutlookExtractor\CController\SaveConfiguration", _
                   "The given Extraction Name is already in use, please choose other one."
     End If
     
     With ObjModel
-       .WriteOnExtractionTable chosenExtraction
-       .WriteOnMailboxTable chosenmailboxes
-       .WriteOnFiltersTable chosenFilters
-       .WriteOnDownloadOptionsTable chosenDownloadOptions
+       .WriteOnExtractionTable ChosenExtraction
+       .WriteOnMailboxTable ChosenMailboxes
+       .WriteOnFiltersTable ChosenFilters
+       .WriteOnDownloadOptionsTable ChosenDownloadOptions
     End With
     
 End Sub
 
 
-Function IsAlreadyInUse(ByRef chosenExtraction As CExtraction) As Boolean
+Function IsAlreadyInUse(ByRef ChosenExtraction As CExtraction) As Boolean
     
-    IsAlreadyInUse = (ObjModel.GetFromExtractionTable(chosenExtraction.ExtractionName) = "")
+    IsAlreadyInUse = (ObjModel.GetFromExtractionTable(ChosenExtraction.ExtractionName) = "")
             
 End Function
 
 
-Function Execute(ByRef chosenmailboxes() As CMailbox, _
-                 ByRef chosenFilters() As CFilters, _
-                 ByRef chosenDownloadOptions As CDownloadOptions)
-
-    
-    
+Function Execute(ByRef ChosenMailboxes() As CMailbox, _
+                 ByRef ChosenFilters() As CFilters, _
+                 ByRef ChosenDownloadOptions As CDownloadOptions)
+                 
+     Dim mailboxes As Collection
+     
+     Set mailboxes = GetChosenMailboxes(ChosenMailboxes)
+                 
+'For Each Mailbox In ChosenMailboxes
+'    mails = GetFilteredMails(Mailbox)
+'    For Each mail In mails
+'        ApplyDownloadOptions mail
+'    Nex
+'Next
 End Function
 
+
+Private Function GetChosenMailboxes(ByRef ChosenMailboxes() As CMailbox) As Collection
+
+    Dim i As Long
+    Dim currentFolder As Object
+    
+    Set GetChosenMailboxes = New Collection
+    
+    For i = LBound(ChosenMailboxes) To UBound(ChosenMailboxes)
+        Set currentFolder = ObjOutlook.Session.GetFolderFromID(ChosenMailboxes(i).MailboxItemId)
+        GetChosenMailboxes.Add currentFolder
+        If CBool(ChosenMailboxes(i).IncludeSubfolders) Then
+            UtilsOutlook.FillCollectionWithAllSubFolders GetChosenMailboxes, currentFolder
+        End If
+    Next
+    
+End Function

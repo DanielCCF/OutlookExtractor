@@ -17,10 +17,17 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private MainController As CController
-Private Mailboxes As Object
+Private mailboxes As Object
+
+Private ChosenExtraction As CExtraction
+Private ChosenMailboxes() As CMailbox
+Private ChosenFilters() As CFilters
+Private ChosenDownloadOptions As CDownloadOptions
+
 Private ListBoxes As Variant
 Private CheckBoxesList As Variant
 Private FlagCheckBoxesList As Variant
+
 Const INVALID_FIELD_COLOR As Variant = &H6464FF
 Const NORMAL_FIELD_COLOR As Variant = &HF0F0FF
 Const BACKGROUND_COLOR As Variant = &H80000004
@@ -29,8 +36,9 @@ Const BACKGROUND_COLOR As Variant = &H80000004
 Private Sub UserForm_Initialize()
 
     Set MainController = New CController
-    Set Mailboxes = MainController.GetMailboxes
+    Set mailboxes = MainController.GetMailboxes
                     LoadAvailableMailboxes
+        
     ListBoxes = Array(MailboxList, FiltersListBox)
     CheckBoxesList = Array(DownloadAttachmentsCheckBox, GetMailAsFileCheckBox, GetMailPropertiesCheckBox)
     FlagCheckBoxesList = Array(FlagDownloadAttachLabel, FlagGetMailAsFileLabel, FlagGetMailPropertiesLabel)
@@ -48,6 +56,47 @@ Private Sub UserForm_Terminate()
 '    Windows(ThisWorkbook.Name).Visible = True
 '    Application.Visible = True
 
+End Sub
+
+
+Private Sub GetCurrentUserInput()
+    
+    Dim i As Integer
+    
+    Set ChosenExtraction = New CExtraction
+    ChosenExtraction.ExtractionName = PreconfiguredExtractionsComboBox.value
+    
+    With MailboxList
+        ReDim ChosenMailboxes(.ListCount - 1)
+        For i = 1 To .ListCount
+            Set ChosenMailboxes(i - 1) = New CMailbox
+            ChosenMailboxes(i - 1).ExtractionName = ChosenExtraction.ExtractionName
+            ChosenMailboxes(i - 1).MailboxItemId = SSupport.GetFolderId(.list(i, 0))
+            ChosenMailboxes(i - 1).IncludeSubfolders = .list(i, 1)
+        Next
+    End With
+    
+    With FiltersListBox
+        ReDim ChosenFilters(.ListCount - 1)
+        For i = 1 To .ListCount
+            Set ChosenFilters(i - 1) = New CFilters
+            ChosenFilters(i - 1).ExtractionName = ChosenExtraction.ExtractionName
+            ChosenFilters(i - 1).MailProperty = .list(i, 0)
+            ChosenFilters(i - 1).FilterType = .list(i, 1)
+            ChosenFilters(i - 1).FilterValue = .list(i, 2)
+        Next
+    End With
+    
+    With ChosenDownloadOptions
+        .ExtractionName = ChosenExtraction.ExtractionName
+        .DownloadFolder = FolderStoreFilesTextBox.value
+        .DownloadAttachments = DownloadAttachmentsCheckBox.value
+        .GetMailAsFile = GetMailAsFileCheckBox.value
+        .GetMailProperties = GetMailPropertiesCheckBox.value
+        .AfterDate = AfterDateTextBox.value
+        .BeforeDate = BeforeDateTextBox.value
+    End With
+    
 End Sub
 
 
@@ -73,11 +122,13 @@ End Sub
 
 Private Sub DeleteExtractionButton_Click()
 
-    If MsgBox("Are you sure deleting this extraction? It will be impossible to revert.") = vbNo Then _
+    If MsgBox("Are you sure deleting this extraction? It is impossible to revert.") = vbNo Then _
         Exit Sub
         
+    MainController.DeleteDataFrom ChosenExtraction
     
-        
+    MsgBox "Data deleted successfully!"
+    
 End Sub
 
 Private Sub PreconfiguredExtractionsComboBox_Change()
@@ -89,10 +140,10 @@ End Sub
 
 Private Sub ExecuteButton_Click()
     
-    Dim chosenExtraction As CExtraction
-    Dim chosenmailboxes As CMailbox
-    Dim chosenFilters As CFilters
-    Dim chosenDownloadOptions As CDownloadOptions
+    Dim ChosenExtraction As CExtraction
+    Dim ChosenMailboxes As CMailbox
+    Dim ChosenFilters As CFilters
+    Dim ChosenDownloadOptions As CDownloadOptions
     
     If HasEmptyFields Then
         MsgBox "Some fields were not filled, please check the tabs.", vbExclamation
@@ -101,15 +152,9 @@ Private Sub ExecuteButton_Click()
     
     RemoveInvalidFieldIndicator
     
-    GetCurrentUserInput chosenmailboxes, _
-                               chosenFilters, _
-                               chosenDownloadOptions
-                               
-'    RecordAsNewExtraction chosenExtraction, _
-'                          chosenmailboxes, _
-'                          chosenFilters, _
-'                          chosenDownloadOptions
-'
+    GetCurrentUserInput
+    
+    MainController.Execute ChosenMailboxes, ChosenFilters, ChosenDownloadOptions
 
 End Sub
 
@@ -123,6 +168,9 @@ Private Sub SaveButton_Click()
     
     RemoveInvalidFieldIndicator
     
+    GetCurrentUserInput
+    
+    RecordAsNewExtraction
     
 End Sub
 
@@ -176,10 +224,7 @@ Private Sub RemoveInvalidFieldIndicator()
 End Sub
 
 
-Private Sub RecordAsNewExtraction(ByRef chosenExtraction As CExtraction, _
-                                  ByRef chosenmailboxes() As CMailbox, _
-                                  ByRef chosenFilters() As CFilters, _
-                                  ByRef chosenDownloadOptions As CDownloadOptions)
+Private Sub RecordAsNewExtraction()
     
     Dim userChoosedAnOption As Boolean
     Dim ExtractionName As String
@@ -191,49 +236,42 @@ Private Sub RecordAsNewExtraction(ByRef chosenExtraction As CExtraction, _
     Do Until userChooseAnOption
         ExtractionName = InputBox("Type a name for your extraction")
         If ExtractionName = "" Then
-            If MsgBox("The name is empty, do you still want to choose a name?", vbYesNo) = vbNo Then _
-                userChoosedAnOption = True
+            userChooseAnOption = UserGaveUpSaving
+        ElseIf MainController.IsAlreadyInUse(ChosenExtraction) Then
+            userChooseAnOption = CanOverwrite
         Else
-            MainController.SaveConfiguration chosenExtraction, _
-                                             chosenmailboxes, _
-                                             chosenFilters, _
-                                             chosenDownloadOptions
+            MainController.SaveConfiguration ChosenExtraction, _
+                                             ChosenMailboxes, _
+                                             ChosenFilters, _
+                                             ChosenDownloadOptions
             userChooseAnOption = True
-            RecordAsNewExtraction = True
         End If
     Loop
     
 End Sub
 
 
-Private Sub GetCurrentUserInput(ByRef chosenExtraction As CExtraction, _
-                                ByRef chosenmailboxes() As CMailbox, _
-                                ByRef chosenFilters() As CFilters, _
-                                ByRef chosenDownloadOptions As CDownloadOptions)
+Private Function UserGaveUpSaving() As Boolean
     
-    Dim i As Integer
-    
-    chosenExtraction.ExtractionName = PreconfiguredExtractionsComboBox.value
-    
-    With MailboxList
-        For i = 1 To .ListCount
-            chosenmailboxes.ExtractionName = chosenExtraction.ExtractionName
-            chosenmailboxes.MailboxItemId = SSupport.GetFolderId(.list(i, 0))
-            chosenmailboxes.IncludeSubfolders = .list(i, 1)
-        Next
-    End With
-    
-    With FiltersListBox
-        For i = 1 To .ListCount
-            chosenFilters.ExtractionName
-            chosenFilters.FilterType
-            chosenFilters.FilterValue
-            chosenFilters.MailProperty
-        Next
-    End With
+    If MsgBox("The name is empty, do you still want to save this configuration?", vbYesNo) = vbYes Then _
+        UserGaveUpSaving = True
+        
+End Function
 
-End Sub
 
+Private Function CanOverwrite() As Boolean
+
+    If MsgBox("This name was already choosen, " & _
+              "do you want to overwrite?", vbYesNo) = vbYes Then
+        MainController.DeleteDataFrom ChosenExtraction
+        MainController.SaveConfiguration ChosenExtraction, _
+                                     ChosenMailboxes, _
+                                     ChosenFilters, _
+                                     ChosenDownloadOptions
+        CanOverwrite = True
+    End If
+
+End Function
 
 '========================
 'Mailbox Page
@@ -253,7 +291,7 @@ Private Sub LoadAvailableMailboxes()
 
     With SSupport
         .EraseCurrentMailBoxes
-        For Each box In Mailboxes
+        For Each box In mailboxes
             MailboxExtractComboBox.AddItem box.FolderPath
             .AddMailbox box.FolderPath, box.entryId ', box.storeId
         Next
@@ -333,23 +371,6 @@ Private Sub AttachFolderButton_Click()
     
     If currentFolder <> "" Then FolderStoreFilesTextBox = currentFolder
     
-End Sub
-
-
-Private Sub DownloadAttachmentsCheckBox_Click()
-    
-    ResetFlagColors
-    If DownloadAttachmentsCheckBox Then
-        NewestOptionButton.Visible = True
-        OldestOptionButton.Visible = True
-        NewestOptionButton.value = True
-    Else
-        NewestOptionButton.Visible = False
-        OldestOptionButton.Visible = False
-        NewestOptionButton.value = False
-        OldestOptionButton.value = False
-    End If
-
 End Sub
 
 
