@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} MainForm 
    Caption         =   "Outlook Extractor"
-   ClientHeight    =   5745
-   ClientLeft      =   120
-   ClientTop       =   465
-   ClientWidth     =   5280
+   ClientHeight    =   5715
+   ClientLeft      =   180
+   ClientTop       =   705
+   ClientWidth     =   5220
    OleObjectBlob   =   "MainForm.frx":0000
    StartUpPosition =   1  'CenterOwner
 End
@@ -55,7 +55,8 @@ Private Sub UserForm_Terminate()
 
 '    Windows(ThisWorkbook.Name).Visible = True
 '    Application.Visible = True
-
+    SSupport.EraseCurrentMailBoxes
+    
 End Sub
 
 
@@ -68,36 +69,48 @@ Private Sub GetCurrentUserInput()
     
     With MailboxList
         ReDim ChosenMailboxes(.ListCount - 1)
-        For i = 1 To .ListCount
-            Set ChosenMailboxes(i - 1) = New CMailbox
-            ChosenMailboxes(i - 1).ExtractionName = ChosenExtraction.ExtractionName
-            ChosenMailboxes(i - 1).MailboxItemId = SSupport.GetFolderId(.list(i, 0))
-            ChosenMailboxes(i - 1).IncludeSubfolders = .list(i, 1)
+        For i = 0 To .ListCount - 1
+            Set ChosenMailboxes(i) = New CMailbox
+            ChosenMailboxes(i).ExtractionName = ChosenExtraction.ExtractionName
+            ChosenMailboxes(i).MailboxItemId = SSupport.GetFolderId(.list(i, 0))
+            ChosenMailboxes(i).IncludeSubfolders = ("Yes" = .list(i, 1))
         Next
     End With
     
     With FiltersListBox
         ReDim ChosenFilters(.ListCount - 1)
-        For i = 1 To .ListCount
-            Set ChosenFilters(i - 1) = New CFilters
-            ChosenFilters(i - 1).ExtractionName = ChosenExtraction.ExtractionName
-            ChosenFilters(i - 1).MailProperty = .list(i, 0)
-            ChosenFilters(i - 1).FilterType = .list(i, 1)
-            ChosenFilters(i - 1).FilterValue = .list(i, 2)
+        For i = 0 To .ListCount - 1
+            Set ChosenFilters(i) = New CFilters
+            ChosenFilters(i).ExtractionName = ChosenExtraction.ExtractionName
+            ChosenFilters(i).MailProperty = .list(i, 0)
+            ChosenFilters(i).FilterType = .list(i, 1)
+            ChosenFilters(i).FilterValue = .list(i, 2)
         Next
     End With
     
+    Set ChosenDownloadOptions = New CDownloadOptions
     With ChosenDownloadOptions
         .ExtractionName = ChosenExtraction.ExtractionName
         .DownloadFolder = FolderStoreFilesTextBox.value
         .DownloadAttachments = DownloadAttachmentsCheckBox.value
         .GetMailAsFile = GetMailAsFileCheckBox.value
         .GetMailProperties = GetMailPropertiesCheckBox.value
-        .AfterDate = AfterDateTextBox.value
-        .BeforeDate = BeforeDateTextBox.value
+        .AfterDate = ConvertTextToDate(AfterDateTextBox.value)
+        .BeforeDate = ConvertTextToDate(BeforeDateTextBox.value)
     End With
     
 End Sub
+
+
+Private Function ConvertTextToDate(ByVal text As String) As Date
+
+    If text = "" Then
+        ConvertTextToDate = CDate(0)
+    Else
+        ConvertTextToDate = CDate(text)
+    End If
+
+End Function
 
 
 '========================
@@ -141,8 +154,8 @@ End Sub
 Private Sub ExecuteButton_Click()
     
     Dim ChosenExtraction As CExtraction
-    Dim ChosenMailboxes As CMailbox
-    Dim ChosenFilters As CFilters
+    Dim ChosenMailboxes() As CMailbox
+    Dim ChosenFilters() As CFilters
     Dim ChosenDownloadOptions As CDownloadOptions
     
     If HasEmptyFields Then
@@ -172,6 +185,8 @@ Private Sub SaveButton_Click()
     
     RecordAsNewExtraction
     
+    MsgBox "Saved successfully!", vbInformation
+
 End Sub
 
 
@@ -214,11 +229,11 @@ Private Sub RemoveInvalidFieldIndicator()
     FolderStoreFilesTextBox.BackColor = NORMAL_FIELD_COLOR
     
     For i = LBound(ListBoxes) To UBound(ListBoxes)
-        ListBoxes.BackColor = NORMAL_FIELD_COLOR
+        ListBoxes(i).BackColor = NORMAL_FIELD_COLOR
     Next
     
     For i = LBound(FlagCheckBoxesList) To UBound(FlagCheckBoxesList)
-        FlagCheckBoxesList.ForeColor = BACKGROUND_COLOR
+        FlagCheckBoxesList(i).ForeColor = BACKGROUND_COLOR
     Next
     
 End Sub
@@ -227,24 +242,28 @@ End Sub
 Private Sub RecordAsNewExtraction()
     
     Dim userChoosedAnOption As Boolean
+    '@TODO Remove
     Dim ExtractionName As String
     Dim tempError As Object
     
     If MsgBox("Do you want to record the current configuration for later use?", vbYesNo) = vbNo Then _
         Exit Sub
     
-    Do Until userChooseAnOption
-        ExtractionName = InputBox("Type a name for your extraction")
-        If ExtractionName = "" Then
-            userChooseAnOption = UserGaveUpSaving
+    Set ChosenExtraction = New CExtraction
+    Do Until userChoosedAnOption
+        ChosenExtraction.ExtractionName = InputBox("Type a name for your extraction")
+        If ChosenExtraction.ExtractionName = "" Then
+            userChoosedAnOption = UserGaveUpSaving
         ElseIf MainController.IsAlreadyInUse(ChosenExtraction) Then
-            userChooseAnOption = CanOverwrite
+            userChoosedAnOption = CanOverwrite
         Else
+            '@TODO Check whata heck is going on
+            FillInputDataWithExtractionName
             MainController.SaveConfiguration ChosenExtraction, _
                                              ChosenMailboxes, _
                                              ChosenFilters, _
                                              ChosenDownloadOptions
-            userChooseAnOption = True
+            userChoosedAnOption = True
         End If
     Loop
     
@@ -253,8 +272,9 @@ End Sub
 
 Private Function UserGaveUpSaving() As Boolean
     
+    UserGaveUpSaving = True
     If MsgBox("The name is empty, do you still want to save this configuration?", vbYesNo) = vbYes Then _
-        UserGaveUpSaving = True
+        UserGaveUpSaving = False
         
 End Function
 
@@ -272,6 +292,24 @@ Private Function CanOverwrite() As Boolean
     End If
 
 End Function
+
+
+Private Function FillInputDataWithExtractionName()
+    
+    Dim i As Integer
+    
+    With ChosenExtraction
+        For i = LBound(ChosenFilters) To UBound(ChosenFilters)
+            ChosenFilters(i).ExtractionName = .ExtractionName
+        Next
+        For i = LBound(ChosenMailboxes) To UBound(ChosenMailboxes)
+            ChosenMailboxes(i).ExtractionName = .ExtractionName
+        Next
+        ChosenDownloadOptions.ExtractionName = .ExtractionName
+    End With
+
+End Function
+
 
 '========================
 'Mailbox Page
@@ -345,7 +383,7 @@ End Sub
 
 
 '========================
-' Download Page
+'Download Page
 '========================
 
 
@@ -434,25 +472,29 @@ End Sub
 '========================
 
 
-Private Sub LoadFilterTypes()
+Private Sub LoadMailPropertiesForFiltering()
     
-    Dim item
+    Dim i As Integer
+    Dim MailProperties() As CMailProperties
     
-    For Each item In SSupport.GetFilterTypes
-        FilterTypeComboBox.AddItem item
+    MailProperties = MainController.GetMailProperties
+    For i = LBound(MailProperties) To UBound(MailProperties)
+        MailPropertyComboBox.AddItem MailProperties(i).Property
     Next
 
 End Sub
 
 
-Private Sub LoadMailPropertiesForFiltering()
+Private Sub LoadFilterTypes()
     
-    Dim item
+    Dim i As Integer
+    Dim FilterTypes() As CFilterTypes
     
-    For Each item In SSupport.GetMailProperties
-        MailPropertyComboBox.AddItem item
+    FilterTypes = MainController.GetFiltersTypes
+    For i = LBound(FilterTypes) To UBound(FilterTypes)
+        FilterTypeComboBox.AddItem FilterTypes(i).TypeName
     Next
-
+    
 End Sub
 
 

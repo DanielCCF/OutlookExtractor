@@ -142,10 +142,10 @@ Private Sub FillAttachmentsDictionary(ByVal currentMailId As String, _
     Dim currentMail As Object
     
     Set ObjOutlook = GetOutlookInstance
-    Set currentMail = ObjOutlook.Session.GetItemFromID(currentMailId)
+    Set currentMail = ObjOutlook.Session.GetItemFromId(currentMailId)
     For Each att In currentMail.Attachments
         If tempDictionary.Exists(att.fileName) Then
-            If currentMail.ReceivedTime > ObjOutlook.Session.GetItemFromID(tempDictionary.item(att.fileName)).ReceivedTime Then
+            If currentMail.ReceivedTime > ObjOutlook.Session.GetItemFromId(tempDictionary.item(att.fileName)).ReceivedTime Then
                  tempDictionary.item(att.fileName) = currentMailId
             End If
         Else

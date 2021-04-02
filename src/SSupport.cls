@@ -103,7 +103,7 @@ Function GetFolderId(ByVal folderName As String) As String
 
 
     On Error Resume Next
-        GetFolderId = SSupport.ListObjects(MailboxesTable). _
+        GetFolderId = SSupport.ListObjects("MailboxesTable"). _
                                DataBodyRange.Columns(1). _
                                Find(folderName).Offset(, 1)
         If Err.Number <> 0 Then

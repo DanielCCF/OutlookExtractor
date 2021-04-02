@@ -10,14 +10,14 @@ Attribute VB_Exposed = False
 Option Explicit
 
 
-Private Type Mailbox
+Private Type mailbox
     ExtractionName As String
     MailboxItemId As String
     IncludeSubfolders As Boolean
 End Type
 
 
-Private this As Mailbox
+Private this As mailbox
 
 
 Public Property Get ExtractionName() As String

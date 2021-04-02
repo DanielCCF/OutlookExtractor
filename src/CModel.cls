@@ -15,6 +15,8 @@ Private ExtractionTable As ListObject
 Private MailboxTable As ListObject
 Private DownloadOptionsTable As ListObject
 Private FiltersTable As ListObject
+Private MailPropertiesTable As ListObject
+Private FilterTypesTable As ListObject
 
 Private Sub Class_Initialize()
     
@@ -23,6 +25,8 @@ Private Sub Class_Initialize()
         Set MailboxTable = .ListObjects("MailboxTable")
         Set DownloadOptionsTable = .ListObjects("DownloadOptionsTable")
         Set FiltersTable = .ListObjects("FiltersTable")
+        Set MailPropertiesTable = .ListObjects("MailPropertiesTable")
+        Set FilterTypesTable = .ListObjects("FilterTypesTable")
     End With
     
 End Sub
@@ -104,7 +108,7 @@ Sub WriteOnDownloadOptionsTable(ByRef info As CDownloadOptions)
 End Sub
 
 
-Sub WriteOnFiltersTable(ByRef info As Filters)
+Sub WriteOnFiltersTable(ByRef info As CFilters)
 
     
      With info
@@ -129,7 +133,7 @@ Private Sub WriteOnTable(ByVal rowInformation As Variant, _
     Dim firstRowIsEmpty As Boolean
     Dim i As Integer
     
-    If targetDataRange.Columns.Count <> UBound(rowInformation) + 1 Then
+    If targetDataRange.Columns.Count <> UBound(rowInformation) Then
        Err.Raise 503, _
                   "\\OutlookExtractor\CModel\WriteOnTable", _
                   "Data mismatch between the given information and the Database. " & _
@@ -148,7 +152,7 @@ Private Sub WriteOnTable(ByVal rowInformation As Variant, _
     End With
     
     For i = LBound(rowInformation) To UBound(rowInformation)
-        referenceCell.Offset(, i) = rowInformation(i)
+        referenceCell.Offset(, i - 1) = rowInformation(i)
     Next
     
 End Sub
@@ -162,6 +166,8 @@ Function GetFromExtractionTable(ByVal ExtractionName As String) As CExtraction()
     Dim i As Long
     
     Set dataRange = GetFilteredTable(ExtractionName, ExtractionTable)
+    
+    If dataRange Is Nothing Then Exit Function
     
     ReDim list(dataRange.Rows.Count)
     For i = FIRST_ELEMENT_ARRAY To dataRange.Rows.Count
@@ -181,6 +187,8 @@ Function GetFromMailboxTable(ByVal ExtractionName As String) As CMailbox()
     Dim list() As CMailbox
     
     Set dataRange = GetFilteredTable(ExtractionName, MailboxTable)
+    
+    If dataRange Is Nothing Then Exit Function
     
     ReDim list(dataRange.Rows.Count)
      For i = FIRST_ELEMENT_ARRAY To dataRange.Rows.Count
@@ -202,6 +210,8 @@ Function GetFromDownloadOptionsTable(ByVal ExtractionName As String) As CDownloa
     Dim list() As CDownloadOptions
     
     Set dataRange = GetFilteredTable(ExtractionName, DownloadOptionsTable)
+    
+    If dataRange Is Nothing Then Exit Function
     
     ReDim list(dataRange.Rows.Count)
     For i = FIRST_ELEMENT_ARRAY To dataRange.Rows.Count
@@ -228,6 +238,8 @@ Function GetFromFiltersTable(ByVal ExtractionName As String) As CFilters()
     
     Set dataRange = GetFilteredTable(ExtractionName, FiltersTable)
     
+    If dataRange Is Nothing Then Exit Function
+    
     ReDim list(dataRange.Rows.Count)
     For i = FIRST_ELEMENT_ARRAY To dataRange.Rows.Count
         Set list(i) = New CFilters
@@ -248,9 +260,59 @@ Private Function GetFilteredTable(ByVal ExtractionName As String, _
     With targetTable
         .Range.AutoFilter
         If ExtractionName <> "" Then .Range.AutoFilter 1, ExtractionName
-        Set GetFilteredTable = .DataBodyRange.SpecialCells(xlCellTypeVisible)
+        On Error Resume Next
+            Set GetFilteredTable = .DataBodyRange.SpecialCells(xlCellTypeVisible)
+        .Range.AutoFilter
     End With
     
 End Function
 
 
+Function GetFromMailPropertiesTable() As CMailProperties()
+
+    Dim i As Long
+    Dim dataRange As Range
+    Dim list() As CMailProperties
+    
+    Set dataRange = GetPropertiesOnDatabase(MailPropertiesTable)
+    
+    If dataRange Is Nothing Then Exit Function
+    
+    ReDim list(dataRange.Rows.Count)
+    For i = FIRST_ELEMENT_ARRAY To dataRange.Rows.Count
+        Set list(i) = New CMailProperties
+        list(i).Property = dataRange.Rows(i).Cells(1, 1)
+    Next
+    
+    GetFromMailPropertiesTable = list
+
+End Function
+
+
+Function GetFromFiltersTypeTable() As CFilterTypes()
+
+    Dim i As Long
+    Dim dataRange As Range
+    Dim list() As CFilterTypes
+    
+    Set dataRange = GetPropertiesOnDatabase(FilterTypesTable)
+    
+    If dataRange Is Nothing Then Exit Function
+    
+    ReDim list(dataRange.Rows.Count)
+    For i = FIRST_ELEMENT_ARRAY To dataRange.Rows.Count
+        Set list(i) = New CFilterTypes
+        list(i).TypeName = dataRange.Rows(i).Cells(1, 1)
+        list(i).RespectiveRegex = dataRange.Rows(i).Cells(1, 2)
+    Next
+    
+    GetFromFiltersTypeTable = list
+
+End Function
+
+
+Private Function GetPropertiesOnDatabase(ByRef targetTable As ListObject) As Range
+
+    Set GetPropertiesOnDatabase = targetTable.DataBodyRange.SpecialCells(xlCellTypeVisible)
+
+End Function
