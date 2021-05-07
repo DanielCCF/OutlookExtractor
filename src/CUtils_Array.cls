@@ -55,6 +55,7 @@ Function IsInitializedArray(ByRef targetArray As Variant) As Boolean
     
     On Error Resume Next
         IsInitializedArray = (UBound(targetArray) > -1)
+        If IsInitializedArray Then Exit Function
         IsInitializedArray = ((Not Not targetArray) = 0)
     On Error GoTo 0
     

@@ -27,9 +27,13 @@ Private ChosenDownloadOptions As CDownloadOptions
 Private ListBoxes As Variant
 Private CheckBoxesList As Variant
 Private FlagCheckBoxesList As Variant
+Private ListCommboBoxes As Variant
+Private ListLabels As Variant
+Private RadioButtonsList As Variant
+
 
 Const INVALID_FIELD_COLOR As Variant = &H6464FF
-Const NORMAL_FIELD_COLOR As Variant = &HF0F0FF
+Const NORMAL_FIELD_COLOR As Variant = &H80000005
 Const BACKGROUND_COLOR As Variant = &H80000004
 
 
@@ -42,6 +46,10 @@ Private Sub UserForm_Initialize()
     ListBoxes = Array(MailboxList, FiltersListBox)
     CheckBoxesList = Array(DownloadAttachmentsCheckBox, GetMailAsFileCheckBox, GetMailPropertiesCheckBox)
     FlagCheckBoxesList = Array(FlagDownloadAttachLabel, FlagGetMailAsFileLabel, FlagGetMailPropertiesLabel)
+    ListCommboBoxes = Array(MailboxExtractComboBox, MailPropertyComboBox, FilterTypeComboBox)
+    ListLabels = Array(FilterValueTextBox, FolderStoreFilesTextBox, AfterDateTextBox, BeforeDateTextBox)
+    RadioButtonsList = Array(IncludeSubfoldersYes, IncludeSubfoldersNo)
+    
     LoadMailPropertiesForFiltering
     LoadFilterTypes
     LoadPreconfiguredExtractions
@@ -144,12 +152,59 @@ Private Sub DeleteExtractionButton_Click()
     
 End Sub
 
+
 Private Sub PreconfiguredExtractionsComboBox_Change()
     
     DeleteExtractionButton.Visible = (PreconfiguredExtractionsComboBox.value <> "")
     DeleteExtractionButton.Enabled = (PreconfiguredExtractionsComboBox.value <> "")
+    
+    EraseUIInformation
+    
+End Sub
+
+
+Sub EraseUIInformation()
+    
+    Dim i As Byte
+    
+    For i = LBound(ListBoxes) To UBound(ListBoxes)
+        ListBoxes(i).Clear
+    Next
+    
+    EraseValueFromUIObjectList ListCommboBoxes
+    EraseValueFromUIObjectList ListLabels
+    EraseValueFromUIObjectList RadioButtonsList
+    EraseValueFromUIObjectList CheckBoxesList
 
 End Sub
+
+
+Private Sub EraseValueFromUIObjectList(ByVal objList As Variant)
+
+
+    Dim i As Byte
+    
+    For i = LBound(objList) To UBound(objList)
+       On Error Resume Next
+            objList(i).value = False
+            If Err.Number <> 0 Or objList(i).value = "FALSE" Then _
+                objList(i).value = ""
+       On Error GoTo 0
+    Next
+
+End Sub
+
+
+Private Sub ClearArrayListBoxes(ByVal arrListBoxes As Variant)
+    
+    Dim i As Byte
+    
+    For i = LBound(arrListBoxes) To UBound(arrListBoxes)
+        arrListBoxes(i).Clear
+    Next
+    
+End Sub
+
 
 Private Sub ExecuteButton_Click()
     
@@ -184,8 +239,6 @@ Private Sub SaveButton_Click()
     GetCurrentUserInput
     
     RecordAsNewExtraction
-    
-    MsgBox "Saved successfully!", vbInformation
 
 End Sub
 
@@ -242,8 +295,6 @@ End Sub
 Private Sub RecordAsNewExtraction()
     
     Dim userChoosedAnOption As Boolean
-    '@TODO Remove
-    Dim ExtractionName As String
     Dim tempError As Object
     
     If MsgBox("Do you want to record the current configuration for later use?", vbYesNo) = vbNo Then _
@@ -257,13 +308,13 @@ Private Sub RecordAsNewExtraction()
         ElseIf MainController.IsAlreadyInUse(ChosenExtraction) Then
             userChoosedAnOption = CanOverwrite
         Else
-            '@TODO Check whata heck is going on
             FillInputDataWithExtractionName
             MainController.SaveConfiguration ChosenExtraction, _
                                              ChosenMailboxes, _
                                              ChosenFilters, _
                                              ChosenDownloadOptions
             userChoosedAnOption = True
+            MsgBox "Saved successfully!", vbInformation
         End If
     Loop
     
@@ -390,6 +441,7 @@ End Sub
 Private Sub FolderStoreFilesTextBox_Change()
     
     FolderStoreFilesTextBox.BackColor = NORMAL_FIELD_COLOR
+
 
 End Sub
 

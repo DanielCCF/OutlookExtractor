@@ -38,19 +38,22 @@ Sub DeleteFromAllTables(ByVal ExtractionName As String)
     Dim i As Integer
     Dim currentData As Range
     
-    If Not (ExtractionTable.DataBodyRange.Find(info.ExtractionName, , , xlWhole, , , True) Is Nothing) Then
+    If (ExtractionTable.DataBodyRange.Find(ExtractionName, , , xlWhole, , , True) Is Nothing) Then
         Err.Raise 513, _
-                  "\\OutlookExtractor\CModel\WriteOnExtractionTable", _
-                  "The given extraction name already exists on the database. Please choose other name."
-    ElseIf extracitoname = "" Then
-        End Sub
+                  "\\OutlookExtractor\CModel\DeleteFromAllTables", _
+                  "The given extraction name does not exist on the database."
+    ElseIf ExtractionName = "" Then
+        Exit Sub
     End If
     
     tables = Array(ExtractionTable, MailboxTable, DownloadOptionsTable, FiltersTable)
     
     For i = LBound(tables) To UBound(tables)
-        Set currentData = GetFilteredTable(ExtractionName, tables(i))
-        currentData.SpecialCells(xlCellTypeVisible).EntireRow.Delete
+        'The tables(i) it's not recognized as a ListObject, so it
+        'was need to convert using the Parent object and tables(i) name
+        Set currentData = GetFilteredTable(ExtractionName, tables(i).Parent.ListObjects(tables(i).name))
+        currentData.SpecialCells(xlCellTypeVisible).Delete xlUp
+        
     Next
 
 End Sub
@@ -143,7 +146,7 @@ Private Sub WriteOnTable(ByVal rowInformation As Variant, _
     
     With targetDataRange
         rowsAmount = .Rows.Count
-        firstRowIsEmpty = Application.CountA(.Rows(1).EntireRow) = 0
+        firstRowIsEmpty = Application.CountA(.Rows(1)) = 0
         If firstRowIsEmpty Then
             Set referenceCell = .Cells(1, 1)
         Else
@@ -261,7 +264,14 @@ Private Function GetFilteredTable(ByVal ExtractionName As String, _
         .Range.AutoFilter
         If ExtractionName <> "" Then .Range.AutoFilter 1, ExtractionName
         On Error Resume Next
-            Set GetFilteredTable = .DataBodyRange.SpecialCells(xlCellTypeVisible)
+            'For some reason, sometimes .DataBodyRange.SpecialCells(xlCellTypeVisible)
+            'returns all the visible cells from SDatabase instead the targetTable.
+            'This situation occurred on the ExtractionTable when it's empty.
+            'To solve this, comparing the Address whas needed
+            If .DataBodyRange.SpecialCells(xlCellTypeVisible).Address <> SDatabase.Cells.SpecialCells(xlCellTypeVisible).Address Then
+                Set GetFilteredTable = .DataBodyRange.SpecialCells(xlCellTypeVisible)
+            End If
+        On Error GoTo 0
         .Range.AutoFilter
     End With
     
