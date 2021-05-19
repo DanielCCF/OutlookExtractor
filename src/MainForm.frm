@@ -141,6 +141,7 @@ Private Sub LoadPreconfiguredExtractions()
     
 End Sub
 
+
 Private Sub DeleteExtractionButton_Click()
 
     If MsgBox("Are you sure deleting this extraction? It is impossible to revert.") = vbNo Then _
@@ -155,10 +156,16 @@ End Sub
 
 Private Sub PreconfiguredExtractionsComboBox_Change()
     
-    DeleteExtractionButton.Visible = (PreconfiguredExtractionsComboBox.value <> "")
-    DeleteExtractionButton.Enabled = (PreconfiguredExtractionsComboBox.value <> "")
+    Dim currentExtractionIsFilled As Boolean
+    
+    currentExtractionIsFilled = (PreconfiguredExtractionsComboBox.value <> "")
     
     EraseUIInformation
+    
+    DeleteExtractionButton.Visible = currentExtractionIsFilled
+    DeleteExtractionButton.Enabled = currentExtractionIsFilled
+    
+    If currentExtractionIsFilled Then BringExtractionInformation
     
 End Sub
 
@@ -181,7 +188,6 @@ End Sub
 
 Private Sub EraseValueFromUIObjectList(ByVal objList As Variant)
 
-
     Dim i As Byte
     
     For i = LBound(objList) To UBound(objList)
@@ -191,6 +197,41 @@ Private Sub EraseValueFromUIObjectList(ByVal objList As Variant)
                 objList(i).value = ""
        On Error GoTo 0
     Next
+
+End Sub
+
+
+Private Sub BringExtractionInformation()
+    
+    Dim objCurrentExtraction As CExtraction
+    
+    Set objCurrentExtraction = New CExtraction
+    
+    objCurrentExtraction.ExtractionName = PreconfiguredExtractionsComboBox.value
+    
+    FillMailboxPage objCurrentExtraction
+    FillFiltersPage objCurrentExtraction
+    FillDownloadPage objCurrentExtraction
+    
+End Sub
+
+
+Private Sub FillMailboxPage(ByRef objCurrentExtraction As CExtraction)
+
+    Dim objMailboxes As CMailbox
+    
+    Set objMailboxes = MainController.GetMailboxesFrom(objCurrentExtraction)
+    
+
+End Sub
+
+
+Private Sub FillFiltersPage(ByRef objCurrentExtraction As CExtraction)
+
+End Sub
+
+
+Private Sub FillDownloadPage(ByRef objCurrentExtraction As CExtraction)
 
 End Sub
 
@@ -487,6 +528,7 @@ Private Sub ResetFlagColors()
     Next
 
 End Sub
+
 
 Private Sub AfterDateTextBox_Exit(ByVal Cancel As MSForms.ReturnBoolean)
 
