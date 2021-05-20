@@ -222,7 +222,9 @@ Private Sub FillMailboxPage(ByRef objCurrentExtraction As CExtraction)
     Dim objMailboxes() As CMailbox
 
     objMailboxes = MainController.GetMailboxesFrom(objCurrentExtraction)
-    If UBound(objMailboxes) = -1 Then Exit Sub
+    On Error Resume Next
+        If UBound(objMailboxes) = -1 Then Exit Sub
+    On Error GoTo 0
     
     For i = LBound(objMailboxes) To UBound(objMailboxes)
         With MailboxList
@@ -245,7 +247,9 @@ Private Sub FillFiltersPage(ByRef objCurrentExtraction As CExtraction)
     Dim objFilters() As CFilters
         
     objFilters = MainController.GetFiltersFrom(objCurrentExtraction)
-    If UBound(objFilters) = -1 Then Exit Sub
+    On Error Resume Next
+        If UBound(objFilters) = -1 Then Exit Sub
+    On Error GoTo 0
     
     For i = LBound(objFilters) To UBound(objFilters)
         With FiltersListBox
