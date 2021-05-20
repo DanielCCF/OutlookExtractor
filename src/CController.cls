@@ -99,8 +99,12 @@ End Function
 
 
 Function GetDownloadOptionsFrom(ByVal currentExtraction As CExtraction) As CDownloadOptions
-
-    GetDownloadOptionsFrom = ObjModel.GetFromDownloadOptionsTable(currentExtraction.ExtractionName)
+    
+    Dim currentDownloadOptions
+    
+    currentDownloadOptions = ObjModel.GetFromDownloadOptionsTable(currentExtraction.ExtractionName)
+    If UBound(currentDownloadOptions) = -1 Then Exit Function
+    Set GetDownloadOptionsFrom = currentDownloadOptions(1)
 
 End Function
 
@@ -256,4 +260,11 @@ Private Function CreateSearchString(ByRef ChosenFilters As CFilters) As String
         End If
     Next
     
+End Function
+
+
+Function GetFullFolderNameFromId(ByVal folderId As String) As String
+
+     GetFullFolderNameFromId = ObjOutlook.Session.GetFolderFromID(folderId).FolderPath
+
 End Function

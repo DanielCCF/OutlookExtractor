@@ -218,21 +218,64 @@ End Sub
 
 Private Sub FillMailboxPage(ByRef objCurrentExtraction As CExtraction)
 
-    Dim objMailboxes As CMailbox
+    Dim i As Integer
+    Dim objMailboxes() As CMailbox
+
+    objMailboxes = MainController.GetMailboxesFrom(objCurrentExtraction)
+    If UBound(objMailboxes) = -1 Then Exit Sub
     
-    Set objMailboxes = MainController.GetMailboxesFrom(objCurrentExtraction)
-    
+    For i = LBound(objMailboxes) To UBound(objMailboxes)
+        With MailboxList
+             .AddItem
+             .list(.ListCount - 1, 0) = MainController.GetFullFolderNameFromId(objMailboxes(i).MailboxItemId)
+            If CBool(objMailboxes(i).IncludeSubfolders) Then
+                .list(.ListCount - 1, 1) = "Yes"
+            Else
+                .list(.ListCount - 1, 1) = "No"
+            End If
+        End With
+    Next
 
 End Sub
 
 
 Private Sub FillFiltersPage(ByRef objCurrentExtraction As CExtraction)
 
+    Dim i As Integer
+    Dim objFilters() As CFilters
+        
+    objFilters = MainController.GetFiltersFrom(objCurrentExtraction)
+    If UBound(objFilters) = -1 Then Exit Sub
+    
+    For i = LBound(objFilters) To UBound(objFilters)
+        With FiltersListBox
+            .AddItem
+            .list(.ListCount - 1, 0) = objFilters(i).MailProperty
+            .list(.ListCount - 1, 1) = objFilters(i).FilterType
+            .list(.ListCount - 1, 2) = objFilters(i).FilterValue
+        End With
+    Next
+    
 End Sub
 
 
 Private Sub FillDownloadPage(ByRef objCurrentExtraction As CExtraction)
 
+    Dim i As Integer
+    Dim objDownloadOptions As CDownloadOptions
+        
+    Set objDownloadOptions = MainController.GetDownloadOptionsFrom(objCurrentExtraction)
+    If objDownloadOptions Is Nothing Then Exit Sub
+    
+    With objDownloadOptions
+        If .AfterDate <> CDate(0) Then AfterDateTextBox = .AfterDate
+        If .AfterDate <> CDate(0) Then BeforeDateTextBox = .BeforeDate
+        FolderStoreFilesTextBox = .DownloadFolder
+        DownloadAttachmentsCheckBox = CBool(.DownloadAttachments)
+        GetMailAsFileCheckBox = CBool(.GetMailAsFile)
+        GetMailPropertiesCheckBox = CBool(.GetMailProperties)
+    End With
+    
 End Sub
 
 

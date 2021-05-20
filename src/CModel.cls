@@ -197,7 +197,7 @@ Function GetFromMailboxTable(ByVal ExtractionName As String) As CMailbox()
      For i = FIRST_ELEMENT_ARRAY To dataRange.Rows.Count
         Set list(i) = New CMailbox
         list(i).ExtractionName = dataRange.Rows(i).Cells(1, 1)
-        list(i).MailboxItemId = dataRange.Rows(i).cels(1, 2)
+        list(i).MailboxItemId = dataRange.Rows(i).Cells(1, 2)
         list(i).IncludeSubfolders = dataRange.Rows(i).Cells(1, 3)
     Next
     
