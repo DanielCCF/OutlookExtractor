@@ -123,13 +123,13 @@ Sub SaveConfiguration(ByRef ChosenExtraction As CExtraction, _
     End If
     
     With ObjModel
-       .WriteOnExtractionTable ChosenExtraction
-       For i = LBound(ChosenMailboxes) To UBound(ChosenMailboxes)
-        .WriteOnMailboxTable ChosenMailboxes(i)
-       Next
-       For i = LBound(ChosenFilters) To UBound(ChosenFilters)
-        .WriteOnFiltersTable ChosenFilters(i)
-       Next
+        .WriteOnExtractionTable ChosenExtraction
+        For i = LBound(ChosenMailboxes) To UBound(ChosenMailboxes)
+            .WriteOnMailboxTable ChosenMailboxes(i)
+        Next
+        For i = LBound(ChosenFilters) To UBound(ChosenFilters)
+            .WriteOnFiltersTable ChosenFilters(i)
+        Next
        
        .WriteOnDownloadOptionsTable ChosenDownloadOptions
     End With

@@ -52,8 +52,34 @@ Sub DeleteFromAllTables(ByVal ExtractionName As String)
         'The tables(i) it's not recognized as a ListObject, so it
         'was need to convert using the Parent object and tables(i) name
         Set currentData = GetFilteredTable(ExtractionName, tables(i).Parent.ListObjects(tables(i).name))
-        currentData.SpecialCells(xlCellTypeVisible).Delete xlUp
-        
+        If Not (currentData Is Nothing) Then
+            currentData.SpecialCells(xlCellTypeVisible).Clear
+            currentData.AutoFilter
+            ClearEmptyRows tables(i)
+        End If
+    Next
+    
+End Sub
+
+
+Private Sub ClearEmptyRows(ByRef targetTable As Variant)
+    
+    Dim row As Range
+    Dim hasOneRow As Boolean
+    Dim isEmptyRow As Boolean
+    Dim lastRow As Long
+    Dim i As Long
+    Dim currentRow As Range
+    
+    lastRow = targetTable.DataBodyRange.Rows.Count
+    
+    For i = lastRow To 1 Step -1
+        Set currentRow = targetTable.DataBodyRange.Rows(i)
+        hasOneRow = (lastRow = 1)
+        isEmptyRow = (Application.CountA(currentRow) = 0)
+        If Not hasOneRow And isEmptyRow Then
+            currentRow.Delete xlUp
+        End If
     Next
 
 End Sub

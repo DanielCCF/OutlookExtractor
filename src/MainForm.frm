@@ -146,7 +146,9 @@ Private Sub DeleteExtractionButton_Click()
 
     If MsgBox("Are you sure deleting this extraction? It is impossible to revert.") = vbNo Then _
         Exit Sub
-        
+            
+    GetCurrentUserInput
+    
     MainController.DeleteDataFrom ChosenExtraction
     
     MsgBox "Data deleted successfully!"
@@ -424,9 +426,9 @@ Private Function CanOverwrite() As Boolean
               "do you want to overwrite?", vbYesNo) = vbYes Then
         MainController.DeleteDataFrom ChosenExtraction
         MainController.SaveConfiguration ChosenExtraction, _
-                                     ChosenMailboxes, _
-                                     ChosenFilters, _
-                                     ChosenDownloadOptions
+                                         ChosenMailboxes, _
+                                         ChosenFilters, _
+                                         ChosenDownloadOptions
         CanOverwrite = True
     End If
 
