@@ -132,7 +132,7 @@ Private Sub LoadPreconfiguredExtractions()
     Dim i As Long
     
     extractions = MainController.GetExtractionsNames
-    
+    PreconfiguredExtractionsComboBox.Clear
     PreconfiguredExtractionsComboBox.AddItem ""
     For i = LBound(extractions) To UBound(extractions)
         PreconfiguredExtractionsComboBox.AddItem extractions(i).ExtractionName
@@ -144,13 +144,13 @@ End Sub
 
 Private Sub DeleteExtractionButton_Click()
 
-    If MsgBox("Are you sure deleting this extraction? It is impossible to revert.") = vbNo Then _
+    If MsgBox("Are you sure deleting this extraction? It is impossible to revert.", vbYesNo) = vbNo Then _
         Exit Sub
             
     GetCurrentUserInput
     
     MainController.DeleteDataFrom ChosenExtraction
-    
+    LoadPreconfiguredExtractions
     MsgBox "Data deleted successfully!"
     
 End Sub
@@ -396,6 +396,7 @@ Private Sub RecordAsNewExtraction()
         If ChosenExtraction.ExtractionName = "" Then
             userChoosedAnOption = UserGaveUpSaving
         ElseIf MainController.IsAlreadyInUse(ChosenExtraction) Then
+            FillInputDataWithExtractionName
             userChoosedAnOption = CanOverwrite
         Else
             FillInputDataWithExtractionName
@@ -407,6 +408,8 @@ Private Sub RecordAsNewExtraction()
             MsgBox "Saved successfully!", vbInformation
         End If
     Loop
+    
+    LoadPreconfiguredExtractions
     
 End Sub
 
