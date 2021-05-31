@@ -98,12 +98,12 @@ End Function
 
 Function GetMailsEntryIdCollectionFromFolder(ByVal TargetFolder As Object) As Collection
 
-    Dim item As Outlook.mailItem
+    Dim item As Object
     Dim obj As Object
     
     Set GetMailsEntryIdCollectionFromFolder = New Collection
     For Each obj In TargetFolder.Items
-        If TypeOf obj Is Outlook.mailItem Then
+        If obj = "Outlook.mailItem" Then
             GetMailsEntryIdCollectionFromFolder.Add obj.entryId
         End If
     Next

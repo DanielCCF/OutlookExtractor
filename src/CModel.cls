@@ -38,7 +38,7 @@ Sub DeleteFromAllTables(ByVal ExtractionName As String)
     Dim i As Integer
     Dim currentData As Range
     
-    If (ExtractionTable.DataBodyRange.Find(ExtractionName, , , xlWhole, , , True) Is Nothing) Then
+    If (ExtractionTable.DataBodyRange.Find(ExtractionName, , , xlWhole, , , False) Is Nothing) Then
         Err.Raise 513, _
                   "\\OutlookExtractor\CModel\DeleteFromAllTables", _
                   "The given extraction name does not exist on the database."

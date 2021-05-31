@@ -298,10 +298,10 @@ End Sub
 
 Private Sub ExecuteButton_Click()
     
-    Dim ChosenExtraction As CExtraction
-    Dim ChosenMailboxes() As CMailbox
-    Dim ChosenFilters() As CFilters
-    Dim ChosenDownloadOptions As CDownloadOptions
+    'Dim ChosenExtraction As CExtraction
+    'Dim ChosenMailboxes() As CMailbox
+    'Dim ChosenFilters() As CFilters
+    'Dim ChosenDownloadOptions As CDownloadOptions
     
     If HasEmptyFields Then
         MsgBox "Some fields were not filled, please check the tabs.", vbExclamation
