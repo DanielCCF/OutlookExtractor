@@ -32,9 +32,16 @@ Property Let Pattern(ByVal textPattern As String)
 End Property
 
 
+Property Let IgnoreCaseSensity(ByVal bol As Boolean)
+
+    RegEx.IgnoreCase = bol
+
+End Property
+
+
 Function HasPattern(ByVal Pattern As String, _
                     ByVal textToSearch As String) As Boolean
-                     
+                         
     With RegEx
         .Pattern = Pattern
         HasPattern = .Test(textToSearch)

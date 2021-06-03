@@ -16,6 +16,7 @@ Attribute VB_Exposed = False
 
 Option Explicit
 
+Private Const MAIL_ITEM = 43
 
 Function GetOutlookInstance(Optional createIfNotFound As Boolean) As Object
 
@@ -103,7 +104,7 @@ Function GetMailsEntryIdCollectionFromFolder(ByVal TargetFolder As Object) As Co
     
     Set GetMailsEntryIdCollectionFromFolder = New Collection
     For Each obj In TargetFolder.Items
-        If obj = "Outlook.mailItem" Then
+        If obj.Class = MAIL_ITEM Then
             GetMailsEntryIdCollectionFromFolder.Add obj.entryId
         End If
     Next
@@ -142,10 +143,10 @@ Private Sub FillAttachmentsDictionary(ByVal currentMailId As String, _
     Dim currentMail As Object
     
     Set ObjOutlook = GetOutlookInstance
-    Set currentMail = ObjOutlook.Session.GetItemFromId(currentMailId)
+    Set currentMail = ObjOutlook.Session.GetItemFromID(currentMailId)
     For Each att In currentMail.Attachments
         If tempDictionary.Exists(att.fileName) Then
-            If currentMail.ReceivedTime > ObjOutlook.Session.GetItemFromId(tempDictionary.item(att.fileName)).ReceivedTime Then
+            If currentMail.ReceivedTime > ObjOutlook.Session.GetItemFromID(tempDictionary.item(att.fileName)).ReceivedTime Then
                  tempDictionary.item(att.fileName) = currentMailId
             End If
         Else

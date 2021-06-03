@@ -21,6 +21,7 @@ Private Sub Class_Initialize()
     Set UtilsOutlook = New CUtils_Outlook
     Set UtilsFolder = New CUtils_Folder
     Set UtilsRegex = New CUtils_Regex
+        UtilsRegex.IgnoreCaseSensity = True
     Set UtilsArray = New CUtils_Array
     Set ObjOutlook = UtilsOutlook.GetOutlookInstance(True)
     Set ObjModel = New CModel
@@ -160,7 +161,7 @@ Function Execute(ByRef ChosenMailboxes() As CMailbox, _
        
     For Each mailbox In mailboxes
         Set mailsIds = UtilsOutlook.GetMailsEntryIdCollectionFromFolder(mailbox)
-'        Set filteredMails = FilterMailsIdsWithChosenFilters(mailsIds, ChosenFilters)
+        FilterMailsIdsWithChosenFilters mailsIds, ChosenFilters
 '        ApplyDownloadOptionsToFilteredMails ChosenDownloadOptions, filteredMails
     Next
 
@@ -188,14 +189,15 @@ End Function
 Private Sub FilterMailsIdsWithChosenFilters(ByRef mailsIds As Collection, _
                                             ByRef ChosenFilters() As CFilters)
     
-    Dim item As Variant
+    Dim i As Long
     Dim mail As Object
+    Dim outInstance As Object
     
-    
-    For Each item In mailsIds
-        Set mail = UtilsOutlook.GetOutlookInstance.Session.GetItemFromId(item)
-        If DoesNotFitInUserCriteria(mail) Then
-            mailsIds.Remove item
+    For i = mailsIds.Count To 1 Step -1
+        Set outInstance = UtilsOutlook.GetOutlookInstance(True)
+        Set mail = outInstance.Session.GetItemFromID(mailsIds.item(i))
+        If DoesNotFitInUserCriteria(mail, ChosenFilters) Then
+            mailsIds.Remove i
         End If
     Next
     
@@ -212,7 +214,7 @@ Private Function DoesNotFitInUserCriteria(ByRef mail As Object, _
     For i = LBound(ChosenFilters) To UBound(ChosenFilters)
         currentMailPropertyText = GetMailPropertyText(mail, ChosenFilters(i))
         currentFilterValue = CreateSearchString(ChosenFilters(i))
-        DoesNotFitInUserCriteria = Not UtilsRegex.HasPattern(currentFilerValue, currentMailPropertyText)
+        DoesNotFitInUserCriteria = Not UtilsRegex.HasPattern(currentFilterValue, currentMailPropertyText)
         If DoesNotFitInUserCriteria Then Exit Function
     Next
 
@@ -230,15 +232,17 @@ Private Function GetMailPropertyText(ByRef mail As Object, _
         If Property.name <> currentFilter.MailProperty Then _
             GoTo Continue
         
-        If Property.Count > 1 Then
-            For Each item In Property
-                joinMultipleProperties = item.value & joinMultipleProperties & ";"
-            Next
-            GetMailPropertyText = GetMailPropertyText
-        Else
-            GetMailPropertyText = Property.value
-        End If
-   
+'        If Property.Count > 1 Then
+'            For Each item In Property
+'                joinMultipleProperties = item.value & joinMultipleProperties & ";"
+'            Next
+'            GetMailPropertyText = GetMailPropertyText
+'        Else
+'            GetMailPropertyText = Property.value
+'        End If
+'
+        GetMailPropertyText = Property.value
+        
 Continue:
     Next
 
@@ -251,11 +255,11 @@ Private Function CreateSearchString(ByRef ChosenFilters As CFilters) As String
     Dim regexSearchString As String
     Dim i As Integer
     
-    Set filterstypesdata = ObjModel.GetFromFiltersTypeTable
+    filterTypesData = ObjModel.GetFromFiltersTypeTable
     
-    For i = LBound(filterstypesdata) To UBound(filterstypesdata)
-        If ChosenFilters.FilterType = filterstypesdata.TypeName Then
-            regexSearchString = filterTypesData.RespectiveRegex
+    For i = LBound(filterTypesData) To UBound(filterTypesData)
+        If ChosenFilters.FilterType = filterTypesData(i).TypeName Then
+            regexSearchString = filterTypesData(i).RespectiveRegex
             CreateSearchString = Replace(regexSearchString, "dummy", ChosenFilters.FilterValue)
         End If
     Next

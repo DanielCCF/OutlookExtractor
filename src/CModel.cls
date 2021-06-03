@@ -341,7 +341,7 @@ Function GetFromFiltersTypeTable() As CFilterTypes()
         list(i).TypeName = dataRange.Rows(i).Cells(1, 1)
         list(i).RespectiveRegex = dataRange.Rows(i).Cells(1, 2)
     Next
-    
+        
     GetFromFiltersTypeTable = list
 
 End Function

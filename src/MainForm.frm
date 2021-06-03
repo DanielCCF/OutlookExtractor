@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} MainForm 
    Caption         =   "Outlook Extractor"
-   ClientHeight    =   5715
-   ClientLeft      =   180
-   ClientTop       =   705
-   ClientWidth     =   5220
+   ClientHeight    =   5685
+   ClientLeft      =   135
+   ClientTop       =   540
+   ClientWidth     =   5190
    OleObjectBlob   =   "MainForm.frx":0000
    StartUpPosition =   1  'CenterOwner
 End
@@ -297,12 +297,7 @@ End Sub
 
 
 Private Sub ExecuteButton_Click()
-    
-    'Dim ChosenExtraction As CExtraction
-    'Dim ChosenMailboxes() As CMailbox
-    'Dim ChosenFilters() As CFilters
-    'Dim ChosenDownloadOptions As CDownloadOptions
-    
+
     If HasEmptyFields Then
         MsgBox "Some fields were not filled, please check the tabs.", vbExclamation
         Exit Sub
