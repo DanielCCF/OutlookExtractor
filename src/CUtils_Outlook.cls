@@ -30,7 +30,7 @@ End Function
 
 
 Sub SaveAttachments(ByVal mail As Object, _
-                    ByVal TargetFolder As String, _
+                    ByVal targetFolder As String, _
                     ByVal saveWithMailTimestamp As Boolean, _
                     Optional textFilter As String)
                      
@@ -44,7 +44,7 @@ Sub SaveAttachments(ByVal mail As Object, _
             If saveWithMailTimestamp Then _
                 mailTimestamp = Format(mail.ReceivedTime, "yyyy_mm_dd__hh_mm_ss_")
             
-            objAttachment.SaveAsFile TargetFolder & "\" & mailTimestamp & objAttachment.fileName
+            objAttachment.SaveAsFile targetFolder & "\" & mailTimestamp & objAttachment.fileName
         End If
     Next
     
@@ -82,13 +82,13 @@ Sub FillCollectionWithSubFolders(ByRef foldersList As Collection, _
 End Sub
 
 
-Function GetAllEmailsFromFolder(ByVal TargetFolder As Object) As Collection
+Function GetAllEmailsFromFolder(ByVal targetFolder As Object) As Collection
 
     Dim obj As Object
     
     Set GetAllEmailsFromFolder = New Collection
 
-    For Each obj In TargetFolder.Items
+    For Each obj In targetFolder.Items
         If TypeOf obj Is Outlook.mailItem Then
             GetAllEmailsFromFolder.Add obj
         End If
@@ -97,13 +97,13 @@ Function GetAllEmailsFromFolder(ByVal TargetFolder As Object) As Collection
 End Function
 
 
-Function GetMailsEntryIdCollectionFromFolder(ByVal TargetFolder As Object) As Collection
+Function GetMailsEntryIdCollectionFromFolder(ByVal targetFolder As Object) As Collection
 
     Dim item As Object
     Dim obj As Object
     
     Set GetMailsEntryIdCollectionFromFolder = New Collection
-    For Each obj In TargetFolder.Items
+    For Each obj In targetFolder.Items
         If obj.Class = MAIL_ITEM Then
             GetMailsEntryIdCollectionFromFolder.Add obj.entryId
         End If

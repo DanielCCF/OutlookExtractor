@@ -22,6 +22,7 @@ Private Sub Class_Initialize()
     Set UtilsFolder = New CUtils_Folder
     Set UtilsRegex = New CUtils_Regex
         UtilsRegex.IgnoreCaseSensity = True
+        UtilsRegex.HasMultipleLines = True
     Set UtilsArray = New CUtils_Array
     Set ObjOutlook = UtilsOutlook.GetOutlookInstance(True)
     Set ObjModel = New CModel
@@ -162,7 +163,7 @@ Function Execute(ByRef ChosenMailboxes() As CMailbox, _
     For Each mailbox In mailboxes
         Set mailsIds = UtilsOutlook.GetMailsEntryIdCollectionFromFolder(mailbox)
         FilterMailsIdsWithChosenFilters mailsIds, ChosenFilters
-'        ApplyDownloadOptionsToFilteredMails ChosenDownloadOptions, filteredMails
+        ApplyDownloadOptionsToFilteredMails ChosenDownloadOptions, mailsIds
     Next
 
 End Function
@@ -227,23 +228,48 @@ Private Function GetMailPropertyText(ByRef mail As Object, _
     Dim Property As Variant
     Dim joinMultipleProperties As String
     Dim item As Variant
+    Dim isMultiProperty As Boolean
+    Dim rightPropertyName As String
+    
+    rightPropertyName = GetRightPropertyName(currentFilter)
     
     For Each Property In mail.ItemProperties
-        If Property.name <> currentFilter.MailProperty Then _
+        
+        If Property.name <> rightPropertyName Then _
             GoTo Continue
         
-'        If Property.Count > 1 Then
-'            For Each item In Property
-'                joinMultipleProperties = item.value & joinMultipleProperties & ";"
-'            Next
-'            GetMailPropertyText = GetMailPropertyText
-'        Else
-'            GetMailPropertyText = Property.value
-'        End If
-'
-        GetMailPropertyText = Property.value
+        On Error Resume Next
+            isMultiProperty = (Property.Count > 1)
+        On Error GoTo 0
         
+        If isMultiProperty Then
+            For Each item In Property
+                joinMultipleProperties = item.value & joinMultipleProperties & ";"
+            Next
+            GetMailPropertyText = joinMultipleProperties
+        Else
+            GetMailPropertyText = Property.value
+        End If
+        
+        Exit Function
 Continue:
+    Next
+
+End Function
+
+
+Private Function GetRightPropertyName(ByRef currentFilter As CFilters) As String
+                                 
+    Dim i As Long
+    Dim mailPropertiesData() As CMailProperties
+    
+    mailPropertiesData = ObjModel.GetFromMailPropertiesTable
+    
+    For i = LBound(mailPropertiesData) To UBound(mailPropertiesData)
+        If currentFilter.MailProperty = mailPropertiesData(i).Property Then
+            GetRightPropertyName = mailPropertiesData(i).RespectiveObjectPropertyName
+            Exit Function
+        End If
     Next
 
 End Function
@@ -261,10 +287,33 @@ Private Function CreateSearchString(ByRef ChosenFilters As CFilters) As String
         If ChosenFilters.FilterType = filterTypesData(i).TypeName Then
             regexSearchString = filterTypesData(i).RespectiveRegex
             CreateSearchString = Replace(regexSearchString, "dummy", ChosenFilters.FilterValue)
+            Exit Function
         End If
     Next
     
 End Function
+
+
+Private Sub ApplyDownloadOptionsToFilteredMails(ByRef ChosenDownloadOptions As CDownloadOptions, _
+                                                ByRef mailsIds As Collection)
+
+    Dim id As Variant
+    Dim outInstance As Object
+    Dim currentMailObject As Object
+    Dim targetFolder As String
+    
+    targetFolder = ChosenDownloadOptions.DownloadFolder
+    Set outInstance = UtilsOutlook.GetOutlookInstance(True)
+    For Each id In mailsIds
+        Set currentMailObject = outInstance.Session.GetItemFromID(id)
+        If IsNotIncludedOnDates(currentMailObject, ChosenDownloadOptions) Then GoTo Continue
+        If CBool(ChosenDownloadOptions.GetMailAsFile) Then SaveMailAsFile id, targetFolder
+        If CBool(ChosenDownloadOptions.GetMailProperties) Then SaveMailProperties id, targetFolder
+        If CBool(ChosenDownloadOptions.DownloadAttachments) Then SaveMailAttachments id, targetFolder
+Continue:
+    Next
+    
+End Sub
 
 
 Function GetFullFolderNameFromId(ByVal folderId As String) As String
@@ -272,3 +321,5 @@ Function GetFullFolderNameFromId(ByVal folderId As String) As String
      GetFullFolderNameFromId = ObjOutlook.Session.GetFolderFromID(folderId).FolderPath
 
 End Function
+
+

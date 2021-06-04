@@ -39,6 +39,13 @@ Property Let IgnoreCaseSensity(ByVal bol As Boolean)
 End Property
 
 
+Property Let HasMultipleLines(ByVal bol As Boolean)
+
+    RegEx.MultiLine = bol
+
+End Property
+
+
 Function HasPattern(ByVal Pattern As String, _
                     ByVal textToSearch As String) As Boolean
                          

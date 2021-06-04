@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} MainForm 
    Caption         =   "Outlook Extractor"
-   ClientHeight    =   5685
-   ClientLeft      =   135
-   ClientTop       =   540
-   ClientWidth     =   5190
+   ClientHeight    =   5700
+   ClientLeft      =   90
+   ClientTop       =   375
+   ClientWidth     =   5250
    OleObjectBlob   =   "MainForm.frx":0000
    StartUpPosition =   1  'CenterOwner
 End

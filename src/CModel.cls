@@ -318,6 +318,7 @@ Function GetFromMailPropertiesTable() As CMailProperties()
     For i = FIRST_ELEMENT_ARRAY To dataRange.Rows.Count
         Set list(i) = New CMailProperties
         list(i).Property = dataRange.Rows(i).Cells(1, 1)
+        list(i).RespectiveObjectPropertyName = dataRange.Rows(i).Cells(1, 2)
     Next
     
     GetFromMailPropertiesTable = list

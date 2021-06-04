@@ -11,14 +11,23 @@ Option Explicit
 
 Private Type MailProperties
     Property As String
+    RespectiveObjectPropertyName As String
 End Type
 
 Private this As MailProperties
+
 
 Public Property Get Property() As String
 
     Property = this.Property
 
+End Property
+
+
+Public Property Get RespectiveObjectPropertyName() As String
+
+    RespectiveObjectPropertyName = this.RespectiveObjectPropertyName
+    
 End Property
 
 
@@ -28,3 +37,9 @@ Public Property Let Property(ByVal value As String)
 
 End Property
 
+
+Public Property Let RespectiveObjectPropertyName(ByVal value As String)
+
+    this.RespectiveObjectPropertyName = value
+
+End Property
