@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} MainForm 
    Caption         =   "Outlook Extractor"
-   ClientHeight    =   5700
-   ClientLeft      =   90
-   ClientTop       =   375
-   ClientWidth     =   5250
+   ClientHeight    =   5730
+   ClientLeft      =   75
+   ClientTop       =   285
+   ClientWidth     =   5175
    OleObjectBlob   =   "MainForm.frx":0000
    StartUpPosition =   1  'CenterOwner
 End
@@ -103,8 +103,8 @@ Private Sub GetCurrentUserInput()
         .DownloadAttachments = DownloadAttachmentsCheckBox.value
         .GetMailAsFile = GetMailAsFileCheckBox.value
         .GetMailProperties = GetMailPropertiesCheckBox.value
-        .AfterDate = ConvertTextToDate(AfterDateTextBox.value)
-        .BeforeDate = ConvertTextToDate(BeforeDateTextBox.value)
+        .afterDate = ConvertTextToDate(AfterDateTextBox.value)
+        .beforeDate = ConvertTextToDate(BeforeDateTextBox.value)
     End With
     
 End Sub
@@ -274,8 +274,8 @@ Private Sub FillDownloadPage(ByRef objCurrentExtraction As CExtraction)
     If objDownloadOptions Is Nothing Then Exit Sub
     
     With objDownloadOptions
-        If .AfterDate <> CDate(0) Then AfterDateTextBox = .AfterDate
-        If .AfterDate <> CDate(0) Then BeforeDateTextBox = .BeforeDate
+        If .afterDate <> CDate(0) Then AfterDateTextBox = .afterDate
+        If .afterDate <> CDate(0) Then BeforeDateTextBox = .beforeDate
         FolderStoreFilesTextBox = .DownloadFolder
         DownloadAttachmentsCheckBox = CBool(.DownloadAttachments)
         GetMailAsFileCheckBox = CBool(.GetMailAsFile)

@@ -16,6 +16,16 @@ Attribute VB_Exposed = False
 Option Explicit
 
 
+Function CreateTimestampedFolder(ByVal targetFolder As String, ByVal targetDate As Date) As String
+
+    On Error Resume Next
+        MkDir targetFolder & "\" & Format(targetDate, "YYYYMMDD")
+        CreateTimestampedFolder = targetFolder & "\" & Format(targetDate, "YYYYMMDD")
+            
+
+End Function
+
+
 Function GetChosenFolderName(Optional initialPath As String) As String
 
     Dim result As String

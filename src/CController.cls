@@ -9,20 +9,21 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-Private UtilsOutlook As CUtils_Outlook
-Private UtilsFolder As CUtils_Folder
-Private UtilsRegex As CUtils_Regex
-Private UtilsArray As CUtils_Array
-Private ObjOutlook As Object
-Private ObjModel As CModel
+Private UtilsOutlook                   As CUtils_Outlook
+Private UtilsFolder                    As CUtils_Folder
+Private UtilsRegex                     As CUtils_Regex
+Private UtilsArray                     As CUtils_Array
+Private ObjOutlook                     As Object
+Private ObjModel                       As CModel
+
 
 Private Sub Class_Initialize()
 
     Set UtilsOutlook = New CUtils_Outlook
     Set UtilsFolder = New CUtils_Folder
     Set UtilsRegex = New CUtils_Regex
-        UtilsRegex.IgnoreCaseSensity = True
-        UtilsRegex.HasMultipleLines = True
+    UtilsRegex.IgnoreCaseSensity = True
+    UtilsRegex.HasMultipleLines = True
     Set UtilsArray = New CUtils_Array
     Set ObjOutlook = UtilsOutlook.GetOutlookInstance(True)
     Set ObjModel = New CModel
@@ -53,7 +54,7 @@ End Function
 
 Function GetExtractionsNames() As CExtraction()
     
-   GetExtractionsNames = ObjModel.GetFromExtractionTable("")
+    GetExtractionsNames = ObjModel.GetFromExtractionTable("")
 
 End Function
 
@@ -76,10 +77,7 @@ End Function
 
 Function IsDate(ByVal target As String) As Boolean
     
-    Dim dummy
-    
     On Error Resume Next
-        dummy = CDate(target)
         If Err.Number = 0 Then IsDate = True
     On Error GoTo 0
 
@@ -116,7 +114,7 @@ Sub SaveConfiguration(ByRef ChosenExtraction As CExtraction, _
                       ByRef ChosenFilters() As CFilters, _
                       ByRef ChosenDownloadOptions As CDownloadOptions)
     
-    Dim i As Integer
+    Dim i                              As Integer
     
     If IsAlreadyInUse(ChosenExtraction) Then
         Err.Raise 513, _
@@ -133,7 +131,7 @@ Sub SaveConfiguration(ByRef ChosenExtraction As CExtraction, _
             .WriteOnFiltersTable ChosenFilters(i)
         Next
        
-       .WriteOnDownloadOptionsTable ChosenDownloadOptions
+        .WriteOnDownloadOptionsTable ChosenDownloadOptions
     End With
     
 End Sub
@@ -141,7 +139,7 @@ End Sub
 
 Function IsAlreadyInUse(ByRef ChosenExtraction As CExtraction) As Boolean
     
-    Dim extractionData() As CExtraction
+    Dim extractionData()               As CExtraction
     
     extractionData = ObjModel.GetFromExtractionTable(ChosenExtraction.ExtractionName)
     IsAlreadyInUse = UtilsArray.IsInitializedArray(extractionData)
@@ -153,10 +151,10 @@ Function Execute(ByRef ChosenMailboxes() As CMailbox, _
                  ByRef ChosenFilters() As CFilters, _
                  ByRef ChosenDownloadOptions As CDownloadOptions)
                  
-    Dim mailboxes As Collection
-    Dim mailbox As Object
-    Dim mailsIds As Collection
-    Dim filteredMails As Collection
+    Dim mailboxes                      As Collection
+    Dim mailbox                        As Object
+    Dim mailsIds                       As Collection
+    Dim filteredMails                  As Collection
     
     Set mailboxes = GetChosenMailboxes(ChosenMailboxes)
        
@@ -171,8 +169,8 @@ End Function
 
 Private Function GetChosenMailboxes(ByRef ChosenMailboxes() As CMailbox) As Collection
 
-    Dim i As Long
-    Dim currentFolder As Object
+    Dim i                              As Long
+    Dim currentFolder                  As Object
     
     Set GetChosenMailboxes = New Collection
     
@@ -190,9 +188,9 @@ End Function
 Private Sub FilterMailsIdsWithChosenFilters(ByRef mailsIds As Collection, _
                                             ByRef ChosenFilters() As CFilters)
     
-    Dim i As Long
-    Dim mail As Object
-    Dim outInstance As Object
+    Dim i                              As Long
+    Dim mail                           As Object
+    Dim outInstance                    As Object
     
     For i = mailsIds.Count To 1 Step -1
         Set outInstance = UtilsOutlook.GetOutlookInstance(True)
@@ -208,9 +206,9 @@ End Sub
 Private Function DoesNotFitInUserCriteria(ByRef mail As Object, _
                                           ByRef ChosenFilters() As CFilters) As Boolean
 
-    Dim i As Integer
-    Dim currentMailPropertyText As String
-    Dim currentFilterValue As String
+    Dim i                              As Integer
+    Dim currentMailPropertyText        As String
+    Dim currentFilterValue             As String
     
     For i = LBound(ChosenFilters) To UBound(ChosenFilters)
         currentMailPropertyText = GetMailPropertyText(mail, ChosenFilters(i))
@@ -225,21 +223,21 @@ End Function
 Private Function GetMailPropertyText(ByRef mail As Object, _
                                      ByRef currentFilter As CFilters) As String
     
-    Dim Property As Variant
-    Dim joinMultipleProperties As String
-    Dim item As Variant
-    Dim isMultiProperty As Boolean
-    Dim rightPropertyName As String
+    Dim Property                       As Variant
+    Dim joinMultipleProperties         As String
+    Dim item                           As Variant
+    Dim isMultiProperty                As Boolean
+    Dim rightPropertyName              As String
     
     rightPropertyName = GetRightPropertyName(currentFilter)
     
     For Each Property In mail.ItemProperties
         
         If Property.name <> rightPropertyName Then _
-            GoTo Continue
+           GoTo Continue
         
         On Error Resume Next
-            isMultiProperty = (Property.Count > 1)
+        isMultiProperty = (Property.Count > 1)
         On Error GoTo 0
         
         If isMultiProperty Then
@@ -260,8 +258,8 @@ End Function
 
 Private Function GetRightPropertyName(ByRef currentFilter As CFilters) As String
                                  
-    Dim i As Long
-    Dim mailPropertiesData() As CMailProperties
+    Dim i                              As Long
+    Dim mailPropertiesData()           As CMailProperties
     
     mailPropertiesData = ObjModel.GetFromMailPropertiesTable
     
@@ -277,9 +275,9 @@ End Function
 
 Private Function CreateSearchString(ByRef ChosenFilters As CFilters) As String
 
-    Dim filterTypesData() As CFilterTypes
-    Dim regexSearchString As String
-    Dim i As Integer
+    Dim filterTypesData()              As CFilterTypes
+    Dim regexSearchString              As String
+    Dim i                              As Integer
     
     filterTypesData = ObjModel.GetFromFiltersTypeTable
     
@@ -297,29 +295,152 @@ End Function
 Private Sub ApplyDownloadOptionsToFilteredMails(ByRef ChosenDownloadOptions As CDownloadOptions, _
                                                 ByRef mailsIds As Collection)
 
-    Dim id As Variant
-    Dim outInstance As Object
-    Dim currentMailObject As Object
-    Dim targetFolder As String
+    Dim mail                           As Variant
+    Dim outInstance                    As Object
+    Dim currentMailObject              As Object
+    Dim targetFolder                   As String
+    Dim currentFolder                  As String
+    Dim mailPopertiesCollection        As Collection
     
     targetFolder = ChosenDownloadOptions.DownloadFolder
     Set outInstance = UtilsOutlook.GetOutlookInstance(True)
-    For Each id In mailsIds
-        Set currentMailObject = outInstance.Session.GetItemFromID(id)
+    Set mailPopertiesCollection = New Collection
+    For Each mail In mailsIds
+        Set currentMailObject = outInstance.Session.GetItemFromID(mail)
         If IsNotIncludedOnDates(currentMailObject, ChosenDownloadOptions) Then GoTo Continue
-        If CBool(ChosenDownloadOptions.GetMailAsFile) Then SaveMailAsFile id, targetFolder
-        If CBool(ChosenDownloadOptions.GetMailProperties) Then SaveMailProperties id, targetFolder
-        If CBool(ChosenDownloadOptions.DownloadAttachments) Then SaveMailAttachments id, targetFolder
+        currentFolder = UtilsFolder.CreateTimestampedFolder(targetFolder, mail.ReceivedTime)
+        If CBool(ChosenDownloadOptions.GetMailAsFile) Then SaveMailAsFile mail, currentFolder
+        If CBool(ChosenDownloadOptions.GetMailProperties) Then SaveMailProperties mail, mailPopertiesCollection
+        If CBool(ChosenDownloadOptions.DownloadAttachments) Then SaveMailAttachments mail, currentFolder
 Continue:
     Next
+    
+    If CBool(ChosenDownloadOptions.GetMailProperties) Then _
+        BuildMailPropertiesReport targetFolder, mailPopertiesCollection
+    
+End Sub
+
+
+Private Function IsNotIncludedOnDates(ByRef currentMailObject As Object, _
+                                      ByRef ChosenDownloadOptions As CDownloadOptions) As Boolean
+
+    Dim before                         As Date
+    Dim after                          As Date
+    
+    before = ChosenDownloadOptions.beforeDate
+    after = ChosenDownloadOptions.afterDate
+    IsNotIncludedOnDates = False
+    
+    If before <> CDate(0) Then
+        IsNotIncludedOnDates = (before <= currentMailObject.ReceivedTime)
+    End If
+    
+    If after <> CDate(0) Then
+        IsNotIncludedOnDates = (after >= currentMailObject.ReceivedTime)
+    End If
+
+End Function
+
+
+Private Sub SaveMailAsFile(ByRef mail As Object, _
+                           ByVal targetFolder As String)
+    
+    Dim fileName                       As String
+    
+    fileName = targetFolder & "\" & _
+               Format(mail.ReceivedTime, "YYMMDD_HHMMSS") & _
+               Left(mail.Subject, 5) & ".msg"
+    mail.SaveAs fileName
+
+End Sub
+
+
+Private Sub StoreMailPropertiesInCollection(ByRef mail As Object, _
+                                            ByRef targetCollection As Collection)
+
+    Dim allAttachmentsNames            As String
+    Dim item                           As Variant
+    Dim isHeaderRow                    As Boolean
+    
+    For Each item In mail.Attachments
+        allAttachmentsNames = allAttachmentsNames & item.value & ";"
+    Next
+    
+    If allAttachmentsNames <> "" Then allAttachmentsNames = Left(allAttachmentsNames, Len(allAttachmentsNames) - 1)
+    
+    isHeaderRow = (targetCollection.Count = 0)
+    With mail
+        If isHeaderRow Then
+            targetCollection.Add _
+            Array("Received by", _
+                  "Sended by", _
+                  "Subject", _
+                  "CC", _
+                  "BCC", _
+                  "Body", _
+                  "Attachments")
+        End If
+        
+        targetCollection.Add _
+        Array(.ReceivedByName, _
+              .SenderEmailAddress, _
+              .Subject, _
+              .CC, _
+              .BCC, _
+              .Body, _
+              allAttachmentsNames)
+    End With
+    
+End Sub
+
+
+Private Sub SaveMailAttachments(ByRef mail As Object, _
+                                ByVal targetFolder As String)
+
+    Dim item                           As Variant
+    Dim currentFileName                As String
+    
+    For Each item In mail.Attachments
+        currentFileName = Format(item.ReceivedTime, "YYMMDD_HHMMSS_") & item.fileName
+        item.SaveAsFile targetFolder & "\" & currentFileName
+    Next
+    
+End Sub
+
+
+Private Sub BuildMailPropertiesReport(ByVal targetFoler As String, _
+                                      ByRef mailPopertiesCollection As Collection)
+
+    Dim i                              As Integer
+    Dim item                           As Variant
+    Dim lastFilledRow                  As Long
+    Dim wkbReport                      As Workbook
+    Dim isEmptyReport                  As Boolean
+    Dim timestampedFilename            As Boolean
+    
+    Set wkbReport = Workbooks.Add
+    
+    For Each item In mailPopertiesCollection
+        isEmptyReport = (wkbReport.Sheets(1).Cells(1, 1) = "")
+        If isEmptyReport Then
+            lastFilledRow = 0
+        Else
+            lastFilledRow = wkbReport.Sheets(1).Cells(1, 1).CurrentRegion.Rows.Count
+        End If
+        For i = LBound(item) To UBound(item)
+           wkbReport.Sheets(1).Cells(i + 1, lastFilledRow + 1) = item(i)
+        Next
+    Next
+    
+    timestampedFilename = Format(Now, "YYYYMMDD_HHMMSS") & "_report.xlsx"
+    wkbReport.SaveAs targetFoler & "\" & timestampedFilename
     
 End Sub
 
 
 Function GetFullFolderNameFromId(ByVal folderId As String) As String
 
-     GetFullFolderNameFromId = ObjOutlook.Session.GetFolderFromID(folderId).FolderPath
+    GetFullFolderNameFromId = ObjOutlook.Session.GetFolderFromID(folderId).FolderPath
 
 End Function
-
 

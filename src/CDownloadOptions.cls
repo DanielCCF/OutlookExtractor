@@ -15,8 +15,8 @@ Private Type DownloadOptions
     DownloadAttachments As Boolean
     GetMailProperties As Boolean
     GetMailAsFile As Boolean
-    AfterDate As Date
-    BeforeDate As Date
+    afterDate As Date
+    beforeDate As Date
 End Type
 
 
@@ -58,16 +58,16 @@ Public Property Get GetMailAsFile() As Boolean
 End Property
 
 
-Public Property Get AfterDate() As Date
+Public Property Get afterDate() As Date
 
-    AfterDate = this.AfterDate
+    afterDate = this.afterDate
 
 End Property
 
 
-Public Property Get BeforeDate() As Date
+Public Property Get beforeDate() As Date
 
-    BeforeDate = this.BeforeDate
+    beforeDate = this.beforeDate
 
 End Property
 
@@ -107,15 +107,15 @@ Public Property Let GetMailAsFile(ByVal value As Boolean)
 End Property
 
 
-Public Property Let AfterDate(ByVal value As Date)
+Public Property Let afterDate(ByVal value As Date)
 
-    this.AfterDate = value
+    this.afterDate = value
 
 End Property
 
 
-Public Property Let BeforeDate(ByVal value As Date)
+Public Property Let beforeDate(ByVal value As Date)
 
-    this.BeforeDate = value
+    this.beforeDate = value
 
 End Property

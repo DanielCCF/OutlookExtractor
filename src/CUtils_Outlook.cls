@@ -18,6 +18,7 @@ Option Explicit
 
 Private Const MAIL_ITEM = 43
 
+
 Function GetOutlookInstance(Optional createIfNotFound As Boolean) As Object
 
     On Error Resume Next
@@ -43,7 +44,6 @@ Sub SaveAttachments(ByVal mail As Object, _
         If hasTextFilter Then
             If saveWithMailTimestamp Then _
                 mailTimestamp = Format(mail.ReceivedTime, "yyyy_mm_dd__hh_mm_ss_")
-            
             objAttachment.SaveAsFile targetFolder & "\" & mailTimestamp & objAttachment.fileName
         End If
     Next
@@ -157,9 +157,7 @@ Private Sub FillAttachmentsDictionary(ByVal currentMailId As String, _
 End Sub
 
 
-
 Function GetSubFoldersFrom(ByRef folder As Object) As Collection
-
 
     Dim f As Object
     
@@ -168,6 +166,5 @@ Function GetSubFoldersFrom(ByRef folder As Object) As Collection
     For Each f In folder.Folders
         GetSubFoldersFrom.Add folder
     Next
+    
 End Function
-
-

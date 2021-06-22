@@ -128,8 +128,8 @@ Sub WriteOnDownloadOptionsTable(ByRef info As CDownloadOptions)
         End If
         
         WriteOnTable Array(.ExtractionName, .DownloadFolder, .DownloadAttachments, _
-                           .GetMailProperties, .GetMailAsFile, .AfterDate, _
-                           .BeforeDate), _
+                           .GetMailProperties, .GetMailAsFile, .afterDate, _
+                           .beforeDate), _
                     DownloadOptionsTable.DataBodyRange
     End With
 
@@ -250,8 +250,8 @@ Function GetFromDownloadOptionsTable(ByVal ExtractionName As String) As CDownloa
         list(i).DownloadAttachments = dataRange.Rows(i).Cells(1, 3)
         list(i).GetMailAsFile = dataRange.Rows(i).Cells(1, 4)
         list(i).GetMailProperties = dataRange.Rows(i).Cells(1, 5)
-        list(i).AfterDate = dataRange.Rows(i).Cells(1, 6)
-        list(i).BeforeDate = dataRange.Rows(i).Cells(1, 7)
+        list(i).afterDate = dataRange.Rows(i).Cells(1, 6)
+        list(i).beforeDate = dataRange.Rows(i).Cells(1, 7)
     Next
     
     GetFromDownloadOptionsTable = list
