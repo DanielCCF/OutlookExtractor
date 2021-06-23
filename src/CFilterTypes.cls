@@ -14,7 +14,9 @@ Private Type FilterTypes
     RespectiveRegex As String
 End Type
 
-Private this As FilterTypes
+
+Private this                           As FilterTypes
+
 
 Public Property Get TypeName() As String
 
@@ -42,3 +44,5 @@ Public Property Let RespectiveRegex(ByVal value As String)
     this.RespectiveRegex = value
 
 End Property
+
+

@@ -16,7 +16,7 @@ Private Type mailbox
 End Type
 
 
-Private this As mailbox
+Private this                           As mailbox
 
 
 Public Property Get ExtractionName() As String
@@ -59,3 +59,5 @@ Public Property Let IncludeSubfolders(ByVal value As Boolean)
     this.IncludeSubfolders = value
 
 End Property
+
+

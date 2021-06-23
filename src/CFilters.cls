@@ -16,7 +16,8 @@ Private Type Filters
     FilterValue As String
 End Type
 
-Private this As Filters
+
+Private this                           As Filters
 
 
 Public Property Get ExtractionName() As String
@@ -73,4 +74,5 @@ Public Property Let FilterValue(ByVal value As String)
     this.FilterValue = value
 
 End Property
+
 

@@ -11,12 +11,13 @@ Option Explicit
 Option Base 1
 
 Private Const FIRST_ELEMENT_ARRAY = 1
-Private ExtractionTable As ListObject
-Private MailboxTable As ListObject
-Private DownloadOptionsTable As ListObject
-Private FiltersTable As ListObject
-Private MailPropertiesTable As ListObject
-Private FilterTypesTable As ListObject
+Private ExtractionTable                As ListObject
+Private MailboxTable                   As ListObject
+Private DownloadOptionsTable           As ListObject
+Private FiltersTable                   As ListObject
+Private MailPropertiesTable            As ListObject
+Private FilterTypesTable               As ListObject
+
 
 Private Sub Class_Initialize()
     
@@ -34,9 +35,9 @@ End Sub
 
 Sub DeleteFromAllTables(ByVal ExtractionName As String)
     
-    Dim tables As Variant
-    Dim i As Integer
-    Dim currentData As Range
+    Dim tables                         As Variant
+    Dim i                              As Integer
+    Dim currentData                    As Range
     
     If (ExtractionTable.DataBodyRange.Find(ExtractionName, , , xlWhole, , , False) Is Nothing) Then
         Err.Raise 513, _
@@ -64,12 +65,12 @@ End Sub
 
 Private Sub ClearEmptyRows(ByRef targetTable As Variant)
     
-    Dim row As Range
-    Dim hasOneRow As Boolean
-    Dim isEmptyRow As Boolean
-    Dim lastRow As Long
-    Dim i As Long
-    Dim currentRow As Range
+    Dim row                            As Range
+    Dim hasOneRow                      As Boolean
+    Dim isEmptyRow                     As Boolean
+    Dim lastRow                        As Long
+    Dim i                              As Long
+    Dim currentRow                     As Range
     
     lastRow = targetTable.DataBodyRange.Rows.Count
     
@@ -108,7 +109,7 @@ Sub WriteOnMailboxTable(ByRef info As CMailbox)
                       "Mailbox Id and(or) Extraction Name are(is) empty"
         End If
         WriteOnTable Array(.ExtractionName, .MailboxItemId, .IncludeSubfolders), _
-                    MailboxTable.DataBodyRange
+        MailboxTable.DataBodyRange
     End With
     
 End Sub
@@ -123,14 +124,14 @@ Sub WriteOnDownloadOptionsTable(ByRef info As CDownloadOptions)
                       "Download folder and(or) Extraction Name are(is) empty"
         ElseIf .DownloadAttachments + .GetMailAsFile + .GetMailProperties = 0 Then
             Err.Raise 513, _
-               "\\OutlookExtractor\CModel\WriteOnDownloadOptionsTable", _
-               "None of the options was selected. Please choose at least one"
+                      "\\OutlookExtractor\CModel\WriteOnDownloadOptionsTable", _
+                      "None of the options was selected. Please choose at least one"
         End If
         
         WriteOnTable Array(.ExtractionName, .DownloadFolder, .DownloadAttachments, _
                            .GetMailProperties, .GetMailAsFile, .afterDate, _
                            .beforeDate), _
-                    DownloadOptionsTable.DataBodyRange
+        DownloadOptionsTable.DataBodyRange
     End With
 
 
@@ -140,14 +141,14 @@ End Sub
 Sub WriteOnFiltersTable(ByRef info As CFilters)
 
     
-     With info
+    With info
         If .ExtractionName = "" Or .MailProperty = "" Or .FilterType = "" Then
             Err.Raise 513, _
                       "\\OutlookExtractor\CModel\WriteOnFiltersTable", _
                       "Mail property and(or) Extraction Name and(or) Filter Type are(is) empty"
         End If
         WriteOnTable Array(.ExtractionName, .MailProperty, .FilterType, .FilterValue), _
-                    FiltersTable.DataBodyRange
+        FiltersTable.DataBodyRange
     End With
 
 
@@ -157,13 +158,13 @@ End Sub
 Private Sub WriteOnTable(ByVal rowInformation As Variant, _
                          ByRef targetDataRange As Range)
 
-    Dim rowsAmount As Long
-    Dim referenceCell As Range
-    Dim firstRowIsEmpty As Boolean
-    Dim i As Integer
+    Dim rowsAmount                     As Long
+    Dim referenceCell                  As Range
+    Dim firstRowIsEmpty                As Boolean
+    Dim i                              As Integer
     
     If targetDataRange.Columns.Count <> UBound(rowInformation) Then
-       Err.Raise 503, _
+        Err.Raise 503, _
                   "\\OutlookExtractor\CModel\WriteOnTable", _
                   "Data mismatch between the given information and the Database. " & _
                   "Please, check if the Database was changed by comparing with a " & _
@@ -189,10 +190,10 @@ End Sub
 
 Function GetFromExtractionTable(ByVal ExtractionName As String) As CExtraction()
 
-    Dim row As Range
-    Dim dataRange As Range
-    Dim list() As CExtraction
-    Dim i As Long
+    Dim row                            As Range
+    Dim dataRange                      As Range
+    Dim list()                         As CExtraction
+    Dim i                              As Long
     
     Set dataRange = GetFilteredTable(ExtractionName, ExtractionTable)
     
@@ -211,16 +212,16 @@ End Function
 
 Function GetFromMailboxTable(ByVal ExtractionName As String) As CMailbox()
 
-    Dim i As Long
-    Dim dataRange As Range
-    Dim list() As CMailbox
+    Dim i                              As Long
+    Dim dataRange                      As Range
+    Dim list()                         As CMailbox
     
     Set dataRange = GetFilteredTable(ExtractionName, MailboxTable)
     
     If dataRange Is Nothing Then Exit Function
     
     ReDim list(dataRange.Rows.Count)
-     For i = FIRST_ELEMENT_ARRAY To dataRange.Rows.Count
+    For i = FIRST_ELEMENT_ARRAY To dataRange.Rows.Count
         Set list(i) = New CMailbox
         list(i).ExtractionName = dataRange.Rows(i).Cells(1, 1)
         list(i).MailboxItemId = dataRange.Rows(i).Cells(1, 2)
@@ -234,9 +235,9 @@ End Function
 
 Function GetFromDownloadOptionsTable(ByVal ExtractionName As String) As CDownloadOptions()
 
-    Dim i As Long
-    Dim dataRange As Range
-    Dim list() As CDownloadOptions
+    Dim i                              As Long
+    Dim dataRange                      As Range
+    Dim list()                         As CDownloadOptions
     
     Set dataRange = GetFilteredTable(ExtractionName, DownloadOptionsTable)
     
@@ -261,9 +262,9 @@ End Function
 
 Function GetFromFiltersTable(ByVal ExtractionName As String) As CFilters()
 
-    Dim i As Long
-    Dim dataRange As Range
-    Dim list() As CFilters
+    Dim i                              As Long
+    Dim dataRange                      As Range
+    Dim list()                         As CFilters
     
     Set dataRange = GetFilteredTable(ExtractionName, FiltersTable)
     
@@ -290,13 +291,13 @@ Private Function GetFilteredTable(ByVal ExtractionName As String, _
         .Range.AutoFilter
         If ExtractionName <> "" Then .Range.AutoFilter 1, ExtractionName
         On Error Resume Next
-            'For some reason, sometimes .DataBodyRange.SpecialCells(xlCellTypeVisible)
-            'returns all the visible cells from SDatabase instead the targetTable.
-            'This situation occurred on the ExtractionTable when it's empty.
-            'To solve this, comparing the Address whas needed
-            If .DataBodyRange.SpecialCells(xlCellTypeVisible).Address <> SDatabase.Cells.SpecialCells(xlCellTypeVisible).Address Then
-                Set GetFilteredTable = .DataBodyRange.SpecialCells(xlCellTypeVisible)
-            End If
+        'For some reason, sometimes .DataBodyRange.SpecialCells(xlCellTypeVisible)
+        'returns all the visible cells from SDatabase instead the targetTable.
+        'This situation occurred on the ExtractionTable when it's empty.
+        'To solve this, comparing the Address whas needed
+        If .DataBodyRange.SpecialCells(xlCellTypeVisible).Address <> SDatabase.Cells.SpecialCells(xlCellTypeVisible).Address Then
+            Set GetFilteredTable = .DataBodyRange.SpecialCells(xlCellTypeVisible)
+        End If
         On Error GoTo 0
         .Range.AutoFilter
     End With
@@ -306,9 +307,9 @@ End Function
 
 Function GetFromMailPropertiesTable() As CMailProperties()
 
-    Dim i As Long
-    Dim dataRange As Range
-    Dim list() As CMailProperties
+    Dim i                              As Long
+    Dim dataRange                      As Range
+    Dim list()                         As CMailProperties
     
     Set dataRange = GetPropertiesOnDatabase(MailPropertiesTable)
     
@@ -328,9 +329,9 @@ End Function
 
 Function GetFromFiltersTypeTable() As CFilterTypes()
 
-    Dim i As Long
-    Dim dataRange As Range
-    Dim list() As CFilterTypes
+    Dim i                              As Long
+    Dim dataRange                      As Range
+    Dim list()                         As CFilterTypes
     
     Set dataRange = GetPropertiesOnDatabase(FilterTypesTable)
     
@@ -353,3 +354,6 @@ Private Function GetPropertiesOnDatabase(ByRef targetTable As ListObject) As Ran
     Set GetPropertiesOnDatabase = targetTable.DataBodyRange.SpecialCells(xlCellTypeVisible)
 
 End Function
+
+
+

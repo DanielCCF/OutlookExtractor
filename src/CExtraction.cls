@@ -13,7 +13,9 @@ Private Type extraction
     ExtractionName As String
 End Type
 
-Private this As extraction
+
+Private this                           As extraction
+
 
 Public Property Get ExtractionName() As String
 
@@ -27,3 +29,5 @@ Public Property Let ExtractionName(ByVal value As String)
     this.ExtractionName = value
 
 End Property
+
+

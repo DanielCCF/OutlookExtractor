@@ -16,32 +16,32 @@ Attribute VB_Exposed = False
 
 Option Explicit
 
-Private MainController As CController
-Private mailboxes As Object
+Private MainController                 As CController
+Private mailboxes                      As Object
 
-Private ChosenExtraction As CExtraction
-Private ChosenMailboxes() As CMailbox
-Private ChosenFilters() As CFilters
-Private ChosenDownloadOptions As CDownloadOptions
+Private ChosenExtraction               As CExtraction
+Private ChosenMailboxes()              As CMailbox
+Private ChosenFilters()                As CFilters
+Private ChosenDownloadOptions          As CDownloadOptions
 
-Private ListBoxes As Variant
-Private CheckBoxesList As Variant
-Private FlagCheckBoxesList As Variant
-Private ListCommboBoxes As Variant
-Private ListLabels As Variant
-Private RadioButtonsList As Variant
+Private ListBoxes                      As Variant
+Private CheckBoxesList                 As Variant
+Private FlagCheckBoxesList             As Variant
+Private ListCommboBoxes                As Variant
+Private ListLabels                     As Variant
+Private RadioButtonsList               As Variant
 
 
-Const INVALID_FIELD_COLOR As Variant = &H6464FF
-Const NORMAL_FIELD_COLOR As Variant = &H80000005
-Const BACKGROUND_COLOR As Variant = &H80000004
+Const INVALID_FIELD_COLOR              As Variant = &H6464FF
+Const NORMAL_FIELD_COLOR               As Variant = &H80000005
+Const BACKGROUND_COLOR                 As Variant = &H80000004
 
 
 Private Sub UserForm_Initialize()
 
     Set MainController = New CController
     Set mailboxes = MainController.GetMailboxes
-                    LoadAvailableMailboxes
+    LoadAvailableMailboxes
         
     ListBoxes = Array(MailboxList, FiltersListBox)
     CheckBoxesList = Array(DownloadAttachmentsCheckBox, GetMailAsFileCheckBox, GetMailPropertiesCheckBox)
@@ -53,16 +53,16 @@ Private Sub UserForm_Initialize()
     LoadMailPropertiesForFiltering
     LoadFilterTypes
     LoadPreconfiguredExtractions
-'    Windows(ThisWorkbook.Name).Visible = False
-'    Application.Visible = False
+    '    Windows(ThisWorkbook.Name).Visible = False
+    '    Application.Visible = False
    
 End Sub
 
 
 Private Sub UserForm_Terminate()
 
-'    Windows(ThisWorkbook.Name).Visible = True
-'    Application.Visible = True
+    '    Windows(ThisWorkbook.Name).Visible = True
+    '    Application.Visible = True
     SSupport.EraseCurrentMailBoxes
     
 End Sub
@@ -70,7 +70,7 @@ End Sub
 
 Private Sub GetCurrentUserInput()
     
-    Dim i As Integer
+    Dim i                              As Integer
     
     Set ChosenExtraction = New CExtraction
     ChosenExtraction.ExtractionName = PreconfiguredExtractionsComboBox.value
@@ -128,8 +128,8 @@ End Function
 
 Private Sub LoadPreconfiguredExtractions()
     
-    Dim extractions() As CExtraction
-    Dim i As Long
+    Dim extractions()                  As CExtraction
+    Dim i                              As Long
     
     extractions = MainController.GetExtractionsNames
     PreconfiguredExtractionsComboBox.Clear
@@ -145,7 +145,7 @@ End Sub
 Private Sub DeleteExtractionButton_Click()
 
     If MsgBox("Are you sure deleting this extraction? It is impossible to revert.", vbYesNo) = vbNo Then _
-        Exit Sub
+                                                                                               Exit Sub
             
     GetCurrentUserInput
     
@@ -158,7 +158,7 @@ End Sub
 
 Private Sub PreconfiguredExtractionsComboBox_Change()
     
-    Dim currentExtractionIsFilled As Boolean
+    Dim currentExtractionIsFilled      As Boolean
     
     currentExtractionIsFilled = (PreconfiguredExtractionsComboBox.value <> "")
     
@@ -174,7 +174,7 @@ End Sub
 
 Sub EraseUIInformation()
     
-    Dim i As Byte
+    Dim i                              As Byte
     
     For i = LBound(ListBoxes) To UBound(ListBoxes)
         ListBoxes(i).Clear
@@ -190,14 +190,14 @@ End Sub
 
 Private Sub EraseValueFromUIObjectList(ByVal objList As Variant)
 
-    Dim i As Byte
+    Dim i                              As Byte
     
     For i = LBound(objList) To UBound(objList)
-       On Error Resume Next
-            objList(i).value = False
-            If Err.Number <> 0 Or objList(i).value = "FALSE" Then _
-                objList(i).value = ""
-       On Error GoTo 0
+        On Error Resume Next
+        objList(i).value = False
+        If Err.Number <> 0 Or objList(i).value = "FALSE" Then _
+                                                 objList(i).value = ""
+        On Error GoTo 0
     Next
 
 End Sub
@@ -205,7 +205,7 @@ End Sub
 
 Private Sub BringExtractionInformation()
     
-    Dim objCurrentExtraction As CExtraction
+    Dim objCurrentExtraction           As CExtraction
     
     Set objCurrentExtraction = New CExtraction
     
@@ -220,18 +220,18 @@ End Sub
 
 Private Sub FillMailboxPage(ByRef objCurrentExtraction As CExtraction)
 
-    Dim i As Integer
-    Dim objMailboxes() As CMailbox
+    Dim i                              As Integer
+    Dim objMailboxes()                 As CMailbox
 
     objMailboxes = MainController.GetMailboxesFrom(objCurrentExtraction)
     On Error Resume Next
-        If UBound(objMailboxes) = -1 Then Exit Sub
+    If UBound(objMailboxes) = -1 Then Exit Sub
     On Error GoTo 0
     
     For i = LBound(objMailboxes) To UBound(objMailboxes)
         With MailboxList
-             .AddItem
-             .list(.ListCount - 1, 0) = MainController.GetFullFolderNameFromId(objMailboxes(i).MailboxItemId)
+            .AddItem
+            .list(.ListCount - 1, 0) = MainController.GetFullFolderNameFromId(objMailboxes(i).MailboxItemId)
             If CBool(objMailboxes(i).IncludeSubfolders) Then
                 .list(.ListCount - 1, 1) = "Yes"
             Else
@@ -245,12 +245,12 @@ End Sub
 
 Private Sub FillFiltersPage(ByRef objCurrentExtraction As CExtraction)
 
-    Dim i As Integer
-    Dim objFilters() As CFilters
+    Dim i                              As Integer
+    Dim objFilters()                   As CFilters
         
     objFilters = MainController.GetFiltersFrom(objCurrentExtraction)
     On Error Resume Next
-        If UBound(objFilters) = -1 Then Exit Sub
+    If UBound(objFilters) = -1 Then Exit Sub
     On Error GoTo 0
     
     For i = LBound(objFilters) To UBound(objFilters)
@@ -267,8 +267,8 @@ End Sub
 
 Private Sub FillDownloadPage(ByRef objCurrentExtraction As CExtraction)
 
-    Dim i As Integer
-    Dim objDownloadOptions As CDownloadOptions
+    Dim i                              As Integer
+    Dim objDownloadOptions             As CDownloadOptions
         
     Set objDownloadOptions = MainController.GetDownloadOptionsFrom(objCurrentExtraction)
     If objDownloadOptions Is Nothing Then Exit Sub
@@ -287,7 +287,7 @@ End Sub
 
 Private Sub ClearArrayListBoxes(ByVal arrListBoxes As Variant)
     
-    Dim i As Byte
+    Dim i                              As Byte
     
     For i = LBound(arrListBoxes) To UBound(arrListBoxes)
         arrListBoxes(i).Clear
@@ -330,8 +330,8 @@ End Sub
 
 Private Function HasEmptyFields() As Boolean
 
-    Dim i As Integer
-    Dim downloadOptionsChecked As Integer
+    Dim i                              As Integer
+    Dim downloadOptionsChecked         As Integer
 
     With FolderStoreFilesTextBox
         If .value = "" Then
@@ -362,7 +362,7 @@ End Function
 
 Private Sub RemoveInvalidFieldIndicator()
 
-    Dim i As Integer
+    Dim i                              As Integer
     
     FolderStoreFilesTextBox.BackColor = NORMAL_FIELD_COLOR
     
@@ -379,11 +379,11 @@ End Sub
 
 Private Sub RecordAsNewExtraction()
     
-    Dim userChoosedAnOption As Boolean
-    Dim tempError As Object
+    Dim userChoosedAnOption            As Boolean
+    Dim tempError                      As Object
     
     If MsgBox("Do you want to record the current configuration for later use?", vbYesNo) = vbNo Then _
-        Exit Sub
+                                                                                           Exit Sub
     
     Set ChosenExtraction = New CExtraction
     Do Until userChoosedAnOption
@@ -413,7 +413,7 @@ Private Function UserGaveUpSaving() As Boolean
     
     UserGaveUpSaving = True
     If MsgBox("The name is empty, do you still want to save this configuration?", vbYesNo) = vbYes Then _
-        UserGaveUpSaving = False
+                                                                                             UserGaveUpSaving = False
         
 End Function
 
@@ -435,7 +435,7 @@ End Function
 
 Private Function FillInputDataWithExtractionName()
     
-    Dim i As Integer
+    Dim i                              As Integer
     
     With ChosenExtraction
         For i = LBound(ChosenFilters) To UBound(ChosenFilters)
@@ -464,7 +464,7 @@ End Sub
 
 Private Sub LoadAvailableMailboxes()
 
-    Dim box As Object
+    Dim box                            As Object
 
     With SSupport
         .EraseCurrentMailBoxes
@@ -543,7 +543,7 @@ End Sub
 
 Private Sub AttachFolderButton_Click()
 
-    Dim currentFolder As String
+    Dim currentFolder                  As String
     
     currentFolder = MainController.GetDownloadFolder(FolderStoreFilesTextBox.value)
     
@@ -568,7 +568,7 @@ End Sub
 
 Private Sub ResetFlagColors()
 
-    Dim i As Integer
+    Dim i                              As Integer
     
     For i = LBound(FlagCheckBoxesList) To UBound(FlagCheckBoxesList)
         FlagCheckBoxesList(i).ForeColor = BACKGROUND_COLOR
@@ -578,15 +578,26 @@ End Sub
 
 
 Private Sub AfterDateTextBox_Exit(ByVal Cancel As MSForms.ReturnBoolean)
-
+    
+    If AfterDateTextBox.value = "" Then Exit Sub
     TreatDateField AfterDateTextBox.Object
     
 End Sub
 
 
 Private Sub BeforeDateTextBox_Exit(ByVal Cancel As MSForms.ReturnBoolean)
-
+    
+    Dim userSpecifiedExactTime As Boolean
+    Const A_MINUTE_BEFORE_COMPLETING_HOUR = 0.99999
+    
+    If BeforeDateTextBox.value = "" Then Exit Sub
+    
+    userSpecifiedExactTime = (InStr(1, BeforeDateTextBox.value, ":") > 1)
+    
     TreatDateField BeforeDateTextBox.Object
+    
+    If Not userSpecifiedExactTime And BeforeDateTextBox.value <> "" Then _
+        BeforeDateTextBox.value = CDate(CDate(BeforeDateTextBox.value) + A_MINUTE_BEFORE_COMPLETING_HOUR)
     
     If AfterDateTextBox <> "" And AfterDateTextBox > BeforeDateTextBox And BeforeDateTextBox <> "" Then
         MsgBox "The final date is lower than start date. Please, fix the dates.", vbExclamation
@@ -598,11 +609,11 @@ End Sub
 
 Private Sub TreatDateField(ByRef field As Object)
 
-    If Not MainController.IsDate(field) And field <> "" Then
+    If Not MainController.IsDate(field) Or field = "" Or InStr(1, field.value, "/") = 0 Then
         MsgBox "The given value is not a date. Please, insert a valid date.", vbExclamation
         field = ""
     Else
-        field = Format(field, "DD/MM/YYYY")
+        field = CDate(field) 'Format(field, "DD/MM/YYYY HH:MM:SS")
     End If
 
 End Sub
@@ -615,8 +626,8 @@ End Sub
 
 Private Sub LoadMailPropertiesForFiltering()
     
-    Dim i As Integer
-    Dim MailProperties() As CMailProperties
+    Dim i                              As Integer
+    Dim MailProperties()               As CMailProperties
     
     MailProperties = MainController.GetMailProperties
     For i = LBound(MailProperties) To UBound(MailProperties)
@@ -628,8 +639,8 @@ End Sub
 
 Private Sub LoadFilterTypes()
     
-    Dim i As Integer
-    Dim FilterTypes() As CFilterTypes
+    Dim i                              As Integer
+    Dim FilterTypes()                  As CFilterTypes
     
     FilterTypes = MainController.GetFiltersTypes
     For i = LBound(FilterTypes) To UBound(FilterTypes)
@@ -683,3 +694,6 @@ Private Sub HomeButton_Click()
     MultiPage.value = 0
     
 End Sub
+
+
+

@@ -19,8 +19,8 @@ Option Explicit
 Function CreateTimestampedFolder(ByVal targetFolder As String, ByVal targetDate As Date) As String
 
     On Error Resume Next
-        MkDir targetFolder & "\" & Format(targetDate, "YYYYMMDD")
-        CreateTimestampedFolder = targetFolder & "\" & Format(targetDate, "YYYYMMDD")
+    MkDir targetFolder & "\" & Format(targetDate, "YYYYMMDD")
+    CreateTimestampedFolder = targetFolder & "\" & Format(targetDate, "YYYYMMDD")
             
 
 End Function
@@ -28,7 +28,7 @@ End Function
 
 Function GetChosenFolderName(Optional initialPath As String) As String
 
-    Dim result As String
+    Dim result                         As String
     
     With Application.FileDialog(msoFileDialogFolderPicker)
         .InitialFileName = initialPath
@@ -44,15 +44,15 @@ Function PickAllFilesNamesInAFolder(ByVal folder As String, _
                                     Optional stringFilter As String, _
                                     Optional delimiter As String) As String
 
-    Dim result As String
-    Dim file As Object
-    Dim filesInChosenFolder As Object
+    Dim result                         As String
+    Dim file                           As Object
+    Dim filesInChosenFolder            As Object
     
     If delimiter = "" Then delimiter = ";"
     
     Set filesInChosenFolder = CreateObject("Scripting.FileSystemObject") _
-                              .GetFolder(folder) _
-                              .files
+        .GetFolder(folder) _
+        .files
 
     For Each file In filesInChosenFolder
         If InStr(1, file.name, stringFilter) > 0 Then
@@ -61,7 +61,9 @@ Function PickAllFilesNamesInAFolder(ByVal folder As String, _
     Next
     
     If result <> "" Then _
-        PickAllFilesNamesInAFolder = Left(result, Len(result) - 1)
+       PickAllFilesNamesInAFolder = Left(result, Len(result) - 1)
 
 End Function
+
+
 

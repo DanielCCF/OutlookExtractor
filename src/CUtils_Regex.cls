@@ -15,7 +15,7 @@ Attribute VB_Exposed = False
 '==================================================================
 Option Explicit
 
-Private RegEx As Object
+Private RegEx                          As Object
 
 
 Private Sub Class_Initialize()
@@ -74,4 +74,6 @@ Function Extract(ByVal Pattern As String, _
     End With
     
 End Function
+
+
 

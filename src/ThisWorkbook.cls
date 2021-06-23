@@ -10,17 +10,20 @@ Attribute VB_Exposed = True
 
 Option Explicit
 
+
 Private Sub Workbook_Open()
 
-'    If Workbooks.Count <> 1 Then
-'        If MsgBox("We detected another opened Excel File. This " & _
-'                  "app will hide them temporarily, and will show again after " & _
-'                  "you close it. Do you want to continue?", vbYesNo + vbInformation) = vbNo Then
-'            ThisWorkbook.Close
-'        End If
-'    End If
-'
-'    MainForm.Show vbModeless
+    '    If Workbooks.Count <> 1 Then
+    '        If MsgBox("We detected another opened Excel File. This " & _
+    '                  "app will hide them temporarily, and will show again after " & _
+    '                  "you close it. Do you want to continue?", vbYesNo + vbInformation) = vbNo Then
+    '            ThisWorkbook.Close
+    '        End If
+    '    End If
+    '
+    '    MainForm.Show vbModeless
 
 End Sub
+
+
 

@@ -17,12 +17,12 @@ Attribute VB_Exposed = False
 
 Private Function RemoveDuplicatesArray1D(ByVal MyArray As Variant) As Variant
     
-    Dim firstElement As Long, lastElement As Long
-    Dim i As Long
-    Dim item As String
+    Dim firstElement                   As Long, lastElement As Long
+    Dim i                              As Long
+    Dim item                           As String
     
-    Dim tempArray() As String
-    Dim tempCollection As New Collection
+    Dim tempArray()                    As String
+    Dim tempCollection                 As New Collection
  
     firstElement = LBound(MyArray)
     lastElement = UBound(MyArray)
@@ -54,9 +54,11 @@ End Function
 Function IsInitializedArray(ByRef targetArray As Variant) As Boolean
     
     On Error Resume Next
-        IsInitializedArray = (UBound(targetArray) > -1)
-        If IsInitializedArray Then Exit Function
-        IsInitializedArray = ((Not Not targetArray) = 0)
+    IsInitializedArray = (UBound(targetArray) > -1)
+    If IsInitializedArray Then Exit Function
+    IsInitializedArray = ((Not Not targetArray) = 0)
     On Error GoTo 0
     
 End Function
+
+

@@ -15,7 +15,7 @@ Function GetMailboxInformation(ByVal dataRow As Long) As Range
     
     If dataRow > GetAmountMailboxes Then
         Err.Raise 513, "It was requested the row " & dataRow & " but the " & _
-                       "mailboxes table only has" & GetAmountMailboxes
+                      "mailboxes table only has" & GetAmountMailboxes
     End If
     
     With Me.ListObjects("MailboxesTable")
@@ -27,7 +27,7 @@ End Function
 
 Sub AddMailbox(ByVal name As String, _
                ByVal entryId As String)
-               'ByVal storeId As String)
+    'ByVal storeId As String)
     
     With GetReferenceCell
         .value = name
@@ -53,7 +53,7 @@ End Function
 
 Sub EraseCurrentMailBoxes()
     
-    Dim firstCellTable As Range
+    Dim firstCellTable                 As Range
     
     With Me.Range("MailboxesTable")
         Set firstCellTable = .Cells(1, 1)
@@ -67,7 +67,7 @@ End Sub
 
 Function GetAmountMailboxes()
 
-     GetAmountMailboxes = Me.ListObjects("MailboxesTable").DataBodyRange.Rows.Count
+    GetAmountMailboxes = Me.ListObjects("MailboxesTable").DataBodyRange.Rows.Count
 
 End Function
 
@@ -89,7 +89,7 @@ End Function
 Private Sub Add1ColumnTableDataInCollection(ByRef targetCollection As Collection, _
                                             ByVal tableName As String)
 
-    Dim rng As Range
+    Dim rng                            As Range
     
     Set targetCollection = New Collection
     
@@ -103,16 +103,19 @@ Function GetFolderId(ByVal folderName As String) As String
 
 
     On Error Resume Next
-        GetFolderId = SSupport.ListObjects("MailboxesTable"). _
-                               DataBodyRange.Columns(1). _
-                               Find(folderName).Offset(, 1)
-        If Err.Number <> 0 Then
-            On Error GoTo 0
-            Err.Raise 513, _
-                    "\\SSupport\GetFolderId", _
-                    "The folder: " & folderName & " was not found."
-        End If
+    GetFolderId = SSupport.ListObjects("MailboxesTable"). _
+        DataBodyRange.Columns(1). _
+        Find(folderName).Offset(, 1)
+    If Err.Number <> 0 Then
+        On Error GoTo 0
+        Err.Raise 513, _
+                  "\\SSupport\GetFolderId", _
+                  "The folder: " & folderName & " was not found."
+    End If
     On Error GoTo 0
 
 
 End Function
+
+
+

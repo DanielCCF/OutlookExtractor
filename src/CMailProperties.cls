@@ -14,7 +14,8 @@ Private Type MailProperties
     RespectiveObjectPropertyName As String
 End Type
 
-Private this As MailProperties
+
+Private this                           As MailProperties
 
 
 Public Property Get Property() As String
@@ -43,3 +44,5 @@ Public Property Let RespectiveObjectPropertyName(ByVal value As String)
     this.RespectiveObjectPropertyName = value
 
 End Property
+
+

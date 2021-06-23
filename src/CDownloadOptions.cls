@@ -20,7 +20,7 @@ Private Type DownloadOptions
 End Type
 
 
-Private this As DownloadOptions
+Private this                           As DownloadOptions
 
 
 Public Property Get ExtractionName() As String
@@ -119,3 +119,5 @@ Public Property Let beforeDate(ByVal value As Date)
     this.beforeDate = value
 
 End Property
+
+
