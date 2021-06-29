@@ -22,8 +22,8 @@ Private Sub Class_Initialize()
     Set UtilsOutlook = New CUtils_Outlook
     Set UtilsFolder = New CUtils_Folder
     Set UtilsRegex = New CUtils_Regex
-    UtilsRegex.IgnoreCaseSensity = True
-    UtilsRegex.HasMultipleLines = True
+        UtilsRegex.IgnoreCaseSensity = True
+        UtilsRegex.HasMultipleLines = True
     Set UtilsArray = New CUtils_Array
     Set ObjOutlook = UtilsOutlook.GetOutlookInstance(True)
     Set ObjModel = New CModel
@@ -302,6 +302,7 @@ Private Sub ApplyDownloadOptionsToFilteredMails(ByRef ChosenDownloadOptions As C
     Dim targetFolder                   As String
     Dim currentFolder                  As String
     Dim mailPopertiesCollection        As Collection
+    Dim mailObj                        As Object
     
     targetFolder = ChosenDownloadOptions.DownloadFolder
     Set outInstance = UtilsOutlook.GetOutlookInstance(True)
@@ -309,15 +310,15 @@ Private Sub ApplyDownloadOptionsToFilteredMails(ByRef ChosenDownloadOptions As C
     For Each mail In mailsIds
         Set currentMailObject = outInstance.Session.GetItemFromID(mail)
         If Not IsIncludedOnDates(currentMailObject, ChosenDownloadOptions) Then GoTo Continue
-        currentFolder = UtilsFolder.CreateTimestampedFolder(targetFolder, mail.ReceivedTime)
-        If CBool(ChosenDownloadOptions.GetMailAsFile) Then SaveMailAsFile mail, currentFolder
-        If CBool(ChosenDownloadOptions.GetMailProperties) Then StoreMailPropertiesInCollection mail, mailPopertiesCollection
-        If CBool(ChosenDownloadOptions.DownloadAttachments) Then SaveMailAttachments mail, currentFolder
+        currentFolder = UtilsFolder.CreateTimestampedFolder(targetFolder, currentMailObject.ReceivedTime)
+        If CBool(ChosenDownloadOptions.GetMailAsFile) Then SaveMailAsFile currentMailObject, currentFolder
+        If CBool(ChosenDownloadOptions.GetMailProperties) Then StoreMailPropertiesInCollection currentMailObject, mailPopertiesCollection
+        If CBool(ChosenDownloadOptions.DownloadAttachments) Then SaveMailAttachments currentMailObject, currentFolder
 Continue:
     Next
     
     If CBool(ChosenDownloadOptions.GetMailProperties) Then _
-                                                      BuildMailPropertiesReport targetFolder, mailPopertiesCollection
+        BuildMailPropertiesReport targetFolder, mailPopertiesCollection
     
 End Sub
 
@@ -334,11 +335,11 @@ Private Function IsIncludedOnDates(ByRef currentMailObject As Object, _
     receivedIn = currentMailObject.ReceivedTime
     
     If before <> CDate(0) And after <> CDate(0) Then
-        IsNotIncludedOnDates = (receivedIn <= before) And (receivedIn >= after)
+        IsIncludedOnDates = (receivedIn <= before) And (receivedIn >= after)
     ElseIf before = CDate(0) And after <> CDate(0) Then
-        IsNotIncludedOnDates = (receivedIn >= after)
+        IsIncludedOnDates = (receivedIn >= after)
     ElseIf before <> CDate(0) And after = CDate(0) Then
-        IsNotIncludedOnDates = (receivedIn <= before)
+        IsIncludedOnDates = (receivedIn <= before)
     End If
     
 
@@ -351,8 +352,8 @@ Private Sub SaveMailAsFile(ByRef mail As Variant, _
     Dim fileName                       As String
     
     fileName = targetFolder & "\" & _
-               Format(mail.ReceivedTime, "YYMMDD_HHMMSS") & _
-               Left(mail.Subject, 5) & ".msg"
+               Format(mail.ReceivedTime, "YYYYMMDD_HHMMSS") & _
+               Left(mail.Subject, 25) & ".msg"
     mail.SaveAs fileName
 
 End Sub
@@ -366,7 +367,7 @@ Private Sub StoreMailPropertiesInCollection(ByRef mail As Variant, _
     Dim isHeaderRow                    As Boolean
     
     For Each item In mail.Attachments
-        allAttachmentsNames = allAttachmentsNames & item.value & ";"
+        allAttachmentsNames = allAttachmentsNames & item & ";"
     Next
     
     If allAttachmentsNames <> "" Then allAttachmentsNames = Left(allAttachmentsNames, Len(allAttachmentsNames) - 1)
@@ -404,7 +405,7 @@ Private Sub SaveMailAttachments(ByRef mail As Variant, _
     Dim currentFileName                As String
     
     For Each item In mail.Attachments
-        currentFileName = Format(item.ReceivedTime, "YYMMDD_HHMMSS_") & item.fileName
+        currentFileName = Format(mail.ReceivedTime, "YYMMDD_HHMMSS_") & item
         item.SaveAsFile targetFolder & "\" & currentFileName
     Next
     
@@ -419,7 +420,7 @@ Private Sub BuildMailPropertiesReport(ByVal targetFolder As String, _
     Dim lastFilledRow                  As Long
     Dim wkbReport                      As Workbook
     Dim isEmptyReport                  As Boolean
-    Dim timestampedFilename            As Boolean
+    Dim timestampedFilename            As String
     
     Set wkbReport = Workbooks.Add
     
@@ -431,12 +432,17 @@ Private Sub BuildMailPropertiesReport(ByVal targetFolder As String, _
             lastFilledRow = wkbReport.Sheets(1).Cells(1, 1).CurrentRegion.Rows.Count
         End If
         For i = LBound(item) To UBound(item)
-            wkbReport.Sheets(1).Cells(i + 1, lastFilledRow + 1) = item(i)
+            wkbReport.Sheets(1).Cells(lastFilledRow + 1, i + 1) = item(i)
         Next
     Next
     
     timestampedFilename = Format(Now, "YYYYMMDD_HHMMSS") & "_report.xlsx"
-    wkbReport.SaveAs targetFolder & "\" & timestampedFilename
+    With wkbReport
+        .Sheets(1).Cells.WrapText = False
+        .Sheets(1).Cells.ColumnWidth = 50
+        .SaveAs targetFolder & "\" & timestampedFilename
+        .Close False
+    End With
     
 End Sub
 

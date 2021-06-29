@@ -579,9 +579,16 @@ End Sub
 
 Private Sub AfterDateTextBox_Exit(ByVal Cancel As MSForms.ReturnBoolean)
     
+    Dim exactTimeIsSpecified As Boolean
+    
     If AfterDateTextBox.value = "" Then Exit Sub
+    
     TreatDateField AfterDateTextBox.Object
     
+    exactTimeIsSpecified = (InStr(1, AfterDateTextBox.value, ":") > 1)
+    If Not exactTimeIsSpecified Then
+        AfterDateTextBox.value = AfterDateTextBox.value & " 00:00:00"
+    End If
 End Sub
 
 
