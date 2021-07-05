@@ -22,8 +22,8 @@ Private Sub Class_Initialize()
     Set UtilsOutlook = New CUtils_Outlook
     Set UtilsFolder = New CUtils_Folder
     Set UtilsRegex = New CUtils_Regex
-        UtilsRegex.IgnoreCaseSensity = True
-        UtilsRegex.HasMultipleLines = True
+    UtilsRegex.IgnoreCaseSensity = True
+    UtilsRegex.HasMultipleLines = True
     Set UtilsArray = New CUtils_Array
     Set ObjOutlook = UtilsOutlook.GetOutlookInstance(True)
     Set ObjModel = New CModel
@@ -310,15 +310,16 @@ Private Sub ApplyDownloadOptionsToFilteredMails(ByRef ChosenDownloadOptions As C
     For Each mail In mailsIds
         Set currentMailObject = outInstance.Session.GetItemFromID(mail)
         If Not IsIncludedOnDates(currentMailObject, ChosenDownloadOptions) Then GoTo Continue
-        currentFolder = UtilsFolder.CreateTimestampedFolder(targetFolder, currentMailObject.ReceivedTime)
+        currentFolder = UtilsFolder.CreateFolder(targetFolder)
         If CBool(ChosenDownloadOptions.GetMailAsFile) Then SaveMailAsFile currentMailObject, currentFolder
         If CBool(ChosenDownloadOptions.GetMailProperties) Then StoreMailPropertiesInCollection currentMailObject, mailPopertiesCollection
         If CBool(ChosenDownloadOptions.DownloadAttachments) Then SaveMailAttachments currentMailObject, currentFolder
 Continue:
     Next
     
-    If CBool(ChosenDownloadOptions.GetMailProperties) Then _
+    If CBool(ChosenDownloadOptions.GetMailProperties) Then
         BuildMailPropertiesReport targetFolder, mailPopertiesCollection
+    End If
     
 End Sub
 
@@ -340,9 +341,10 @@ Private Function IsIncludedOnDates(ByRef currentMailObject As Object, _
         IsIncludedOnDates = (receivedIn >= after)
     ElseIf before <> CDate(0) And after = CDate(0) Then
         IsIncludedOnDates = (receivedIn <= before)
+    ElseIf before = CDate(0) And after = CDate(0) Then
+        IsIncludedOnDates = True
     End If
     
-
 End Function
 
 
@@ -405,7 +407,7 @@ Private Sub SaveMailAttachments(ByRef mail As Variant, _
     Dim currentFileName                As String
     
     For Each item In mail.Attachments
-        currentFileName = Format(mail.ReceivedTime, "YYMMDD_HHMMSS_") & item
+        currentFileName = Format(mail.ReceivedTime, "YYYYMMDD_HHMMSS_") & item
         item.SaveAsFile targetFolder & "\" & currentFileName
     Next
     
@@ -452,3 +454,6 @@ Function GetFullFolderNameFromId(ByVal folderId As String) As String
     GetFullFolderNameFromId = ObjOutlook.Session.GetFolderFromID(folderId).FolderPath
 
 End Function
+
+
+

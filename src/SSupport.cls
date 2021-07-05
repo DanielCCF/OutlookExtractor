@@ -27,12 +27,10 @@ End Function
 
 Sub AddMailbox(ByVal name As String, _
                ByVal entryId As String)
-    'ByVal storeId As String)
     
     With GetReferenceCell
         .value = name
         .Offset(, 1).value = entryId
-        '.Offset(, 2).value = storeId
     End With
     
 End Sub

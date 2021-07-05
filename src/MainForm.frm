@@ -39,8 +39,17 @@ Const BACKGROUND_COLOR                 As Variant = &H80000004
 
 Private Sub UserForm_Initialize()
 
+    
+    On Error GoTo ErrorHandling
+    
     Set MainController = New CController
     Set mailboxes = MainController.GetMailboxes
+    
+    Windows(ThisWorkbook.name).Visible = False
+    Application.Visible = False
+    
+    ChangeToLoadingStatus
+    
     LoadAvailableMailboxes
         
     ListBoxes = Array(MailboxList, FiltersListBox)
@@ -53,18 +62,66 @@ Private Sub UserForm_Initialize()
     LoadMailPropertiesForFiltering
     LoadFilterTypes
     LoadPreconfiguredExtractions
-    '    Windows(ThisWorkbook.Name).Visible = False
-    '    Application.Visible = False
-   
+       
+    ChangeToReadyStatus
+    
+    Exit Sub
+    
+ErrorHandling:
+
+    MsgBox "An error happened during the tool initialization stage" & _
+           ", please check if Outlook is available, and if has an " & _
+           "account configured. Here is the full error description: " & vbNewLine & _
+           "Error Number: " & Err.Number & vbNewLine & _
+           "Error Description: " & Err.Description & vbNewLine & _
+           "Error Source: " & Err.Source & vbNewLine, vbCritical
+
 End Sub
 
 
 Private Sub UserForm_Terminate()
-
-    '    Windows(ThisWorkbook.Name).Visible = True
-    '    Application.Visible = True
-    SSupport.EraseCurrentMailBoxes
     
+    On Error Resume Next
+    Windows(ThisWorkbook.name).Visible = True
+    Application.Visible = True
+    SSupport.EraseCurrentMailBoxes
+    'ThisWorkbook.Close False
+
+End Sub
+
+
+Private Sub ChangeToLoadingStatus()
+
+    PreconfiguredExtractionsLabel.Visible = False
+    PreconfiguredExtractionsComboBox.Visible = False
+    ExecuteButton.Visible = False
+    DeleteExtractionButton.Visible = False
+    SaveButton.Visible = False
+
+    With MultiPage
+        .Pages("MailboxPage").Enabled = False
+        .Pages("FiltersPage").Enabled = False
+        .Pages("DownloadPage").Enabled = False
+    End With
+
+End Sub
+
+
+Private Sub ChangeToReadyStatus()
+
+    PreconfiguredExtractionsLabel.Visible = True
+    PreconfiguredExtractionsComboBox.Visible = True
+    ExecuteButton.Visible = True
+    DeleteExtractionButton.Visible = True
+    SaveButton.Visible = True
+
+    With MultiPage
+        .Pages("MailboxPage").Enabled = True
+        .Pages("FiltersPage").Enabled = True
+        .Pages("DownloadPage").Enabled = True
+    End With
+
+    LoadingLabel.Visible = False
 End Sub
 
 
@@ -144,15 +201,28 @@ End Sub
 
 Private Sub DeleteExtractionButton_Click()
 
-    If MsgBox("Are you sure deleting this extraction? It is impossible to revert.", vbYesNo) = vbNo Then _
-                                                                                               Exit Sub
+    On Error GoTo ErrorHandling
+    
+    If MsgBox("Are you sure deleting this extraction? It is impossible to revert.", _
+              vbYesNo) = vbNo Then Exit Sub
             
     GetCurrentUserInput
     
     MainController.DeleteDataFrom ChosenExtraction
     LoadPreconfiguredExtractions
-    MsgBox "Data deleted successfully!"
     
+    MsgBox "Data deleted successfully!", vbInformation
+    
+    Exit Sub
+    
+ErrorHandling:
+    
+    MsgBox "An error happened during the deleting" & _
+           ". Here is the full error description: " & vbNewLine & _
+           "Error Number: " & Err.Number & vbNewLine & _
+           "Error Description: " & Err.Description & vbNewLine & _
+           "Error Source: " & Err.Source & vbNewLine, vbCritical
+           
 End Sub
 
 
@@ -298,6 +368,9 @@ End Sub
 
 Private Sub ExecuteButton_Click()
 
+
+    On Error GoTo ErrorHandling
+    
     If HasEmptyFields Then
         MsgBox "Some fields were not filled, please check the tabs.", vbExclamation
         Exit Sub
@@ -308,12 +381,26 @@ Private Sub ExecuteButton_Click()
     GetCurrentUserInput
     
     MainController.Execute ChosenMailboxes, ChosenFilters, ChosenDownloadOptions
+    
+    MsgBox "Execution completed!", vbInformation
+    
+    Exit Sub
+    
+ErrorHandling:
+    MsgBox "An error happened during the tool execution" & _
+           ", please check if all the information was provided" & _
+           ". Here is the full error description: " & vbNewLine & _
+           "Error Number: " & Err.Number & vbNewLine & _
+           "Error Description: " & Err.Description & vbNewLine & _
+           "Error Source: " & Err.Source & vbNewLine, vbCritical
 
 End Sub
 
 
 Private Sub SaveButton_Click()
 
+    On Error GoTo ErrorHandling
+    
     If HasEmptyFields Then
         MsgBox "Some fields were not filled, please check the tabs.", vbExclamation
         Exit Sub
@@ -324,6 +411,16 @@ Private Sub SaveButton_Click()
     GetCurrentUserInput
     
     RecordAsNewExtraction
+
+    Exit Sub
+    
+ErrorHandling:
+    MsgBox "An error happened during the tool saving stage" & _
+           ", please check if all the information was provided" & _
+           ". Here is the full error description: " & vbNewLine & _
+           "Error Number: " & Err.Number & vbNewLine & _
+           "Error Description: " & Err.Description & vbNewLine & _
+           "Error Source: " & Err.Source & vbNewLine, vbCritical
 
 End Sub
 
@@ -579,7 +676,7 @@ End Sub
 
 Private Sub AfterDateTextBox_Exit(ByVal Cancel As MSForms.ReturnBoolean)
     
-    Dim exactTimeIsSpecified As Boolean
+    Dim exactTimeIsSpecified           As Boolean
     
     If AfterDateTextBox.value = "" Then Exit Sub
     
@@ -594,7 +691,7 @@ End Sub
 
 Private Sub BeforeDateTextBox_Exit(ByVal Cancel As MSForms.ReturnBoolean)
     
-    Dim userSpecifiedExactTime As Boolean
+    Dim userSpecifiedExactTime         As Boolean
     Const A_MINUTE_BEFORE_COMPLETING_HOUR = 0.99999
     
     If BeforeDateTextBox.value = "" Then Exit Sub
@@ -604,7 +701,7 @@ Private Sub BeforeDateTextBox_Exit(ByVal Cancel As MSForms.ReturnBoolean)
     TreatDateField BeforeDateTextBox.Object
     
     If Not userSpecifiedExactTime And BeforeDateTextBox.value <> "" Then _
-        BeforeDateTextBox.value = CDate(CDate(BeforeDateTextBox.value) + A_MINUTE_BEFORE_COMPLETING_HOUR)
+       BeforeDateTextBox.value = CDate(CDate(BeforeDateTextBox.value) + A_MINUTE_BEFORE_COMPLETING_HOUR)
     
     If AfterDateTextBox <> "" And AfterDateTextBox > BeforeDateTextBox And BeforeDateTextBox <> "" Then
         MsgBox "The final date is lower than start date. Please, fix the dates.", vbExclamation
@@ -620,7 +717,7 @@ Private Sub TreatDateField(ByRef field As Object)
         MsgBox "The given value is not a date. Please, insert a valid date.", vbExclamation
         field = ""
     Else
-        field = CDate(field) 'Format(field, "DD/MM/YYYY HH:MM:SS")
+        field = CDate(field)
     End If
 
 End Sub

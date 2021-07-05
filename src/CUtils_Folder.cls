@@ -15,6 +15,13 @@ Attribute VB_Exposed = False
 '==================================================================
 Option Explicit
 
+Function CreateFolder(ByVal targetFolder As String) As String
+
+    On Error Resume Next
+    MkDir targetFolder
+    CreateFolder = targetFolder
+    
+End Function
 
 Function CreateTimestampedFolder(ByVal targetFolder As String, ByVal targetDate As Date) As String
 
