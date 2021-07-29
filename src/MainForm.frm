@@ -369,7 +369,7 @@ End Sub
 Private Sub ExecuteButton_Click()
 
 
-    On Error GoTo ErrorHandling
+    'On Error GoTo ErrorHandling
     
     If HasEmptyFields Then
         MsgBox "Some fields were not filled, please check the tabs.", vbExclamation

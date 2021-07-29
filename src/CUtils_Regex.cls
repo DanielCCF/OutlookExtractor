@@ -76,4 +76,17 @@ Function Extract(ByVal Pattern As String, _
 End Function
 
 
+Function Replace(ByVal Pattern As String, _
+                 ByVal textToReplace As String, _
+                 ByVal textReplacement As String) As String
+            
+    With RegEx
+        .Pattern = Pattern
+        .Global = True
+        Replace = .Replace(textToReplace, textReplacement)
+        .Global = False
+        .Pattern = ""
+    End With
+    
+End Function
 

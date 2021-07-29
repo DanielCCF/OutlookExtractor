@@ -352,10 +352,17 @@ Private Sub SaveMailAsFile(ByRef mail As Variant, _
                            ByVal targetFolder As String)
     
     Dim fileName                       As String
+    Dim formatedSubjectText            As String
+    Dim lettersSpaceAndNumbersPattern As String
     
+    lettersSpaceAndNumbersPattern = "[^\w\s]"
+    formatedSubjectText = UtilsRegex.Replace(lettersSpaceAndNumbersPattern, _
+                                             mail.Subject, _
+                                             "")
     fileName = targetFolder & "\" & _
                Format(mail.ReceivedTime, "YYYYMMDD_HHMMSS") & _
-               Left(mail.Subject, 25) & ".msg"
+               Left(formatedSubjectText, 25) & ".msg"
+
     mail.SaveAs fileName
 
 End Sub
@@ -442,7 +449,9 @@ Private Sub BuildMailPropertiesReport(ByVal targetFolder As String, _
     With wkbReport
         .Sheets(1).Cells.WrapText = False
         .Sheets(1).Cells.ColumnWidth = 50
+        Application.DisplayAlerts = False
         .SaveAs targetFolder & "\" & timestampedFilename
+        Application.DisplayAlerts = True
         .Close False
     End With
     
